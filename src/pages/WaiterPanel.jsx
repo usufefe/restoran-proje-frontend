@@ -57,12 +57,15 @@ const WaiterPanel = () => {
         loadOrders();
       });
 
-      return () => {
-        newSocket.disconnect();
-      };
     } catch (error) {
       console.log('WebSocket initialization failed:', error);
     }
+
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
   }, [restaurantId, toast]);
 
   useEffect(() => {

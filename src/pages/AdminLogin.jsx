@@ -76,7 +76,7 @@ const AdminLogin = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center text-2xl font-bold text-gray-900 mb-2">
-            <img src="/pardonbakarmisin logo.png" alt="QR Menü Sistemi" className="h-10 w-10 mr-3" />
+            <img src="/pardonbakarmisin%20logo.png" alt="QR Menü Sistemi" className="h-10 w-10 mr-3" />
             QR Menü Sistemi
           </Link>
           <p className="text-gray-600">Personel Girişi</p>

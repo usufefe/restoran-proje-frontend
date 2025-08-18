@@ -19,15 +19,31 @@ const WaiterPanel = () => {
   const [activeTab, setActiveTab] = useState('ready');
 
   useEffect(() => {
-    // Initialize WebSocket connection - TEMPORARILY DISABLED
-    // const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001');
-    // setSocket(newSocket);
+    // Initialize WebSocket connection with error handling
+    try {
+      const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001', {
+        transports: ['websocket', 'polling'],
+        timeout: 5000,
+        autoConnect: false
+      });
+      
+      // Error handling
+      newSocket.on('connect_error', (error) => {
+        console.log('WebSocket connection failed:', error);
+      });
 
-    // Join restaurant room
-    // newSocket.emit('join-restaurant', { restaurantId });
+      newSocket.on('disconnect', (reason) => {
+        console.log('WebSocket disconnected:', reason);
+      });
 
-    // Listen for order updates
-    newSocket.on('order.updated', (orderData) => {
+      newSocket.connect();
+      setSocket(newSocket);
+
+      // Join restaurant room
+      newSocket.emit('join-restaurant', { restaurantId });
+
+      // Listen for order updates
+      newSocket.on('order.updated', (orderData) => {
       if (orderData.status === 'READY') {
         toast({
           title: "Sipariş Hazır!",

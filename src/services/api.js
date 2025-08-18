@@ -42,6 +42,14 @@ export const authAPI = {
   changePassword: (passwords) => api.post('/auth/change-password', passwords),
 };
 
+// Create axios instance without auth for customer operations
+const customerApi = axios.create({
+  baseURL: `${API_BASE_URL}/api`,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
 // Session API (for QR codes and customer sessions)
 export const sessionAPI = {
   openSession: (sessionData) => api.post('/session/open', sessionData),
@@ -51,21 +59,21 @@ export const sessionAPI = {
 
 // Menu API
 export const menuAPI = {
-  getMenu: (restaurantId) => api.get(`/menu/${restaurantId}`),
-  getCategories: (restaurantId) => api.get(`/menu/${restaurantId}/categories`),
-  getItems: (restaurantId, categoryId) => api.get(`/menu/${restaurantId}/items/${categoryId}`),
+  getMenu: (restaurantId) => customerApi.get(`/menu/${restaurantId}`), // No auth for customer menu
+  getCategories: (restaurantId) => customerApi.get(`/menu/${restaurantId}/categories`), // No auth for customer menu
+  getItems: (restaurantId, categoryId) => customerApi.get(`/menu/${restaurantId}/items/${categoryId}`), // No auth for customer menu
 };
 
 // Orders API
 export const ordersAPI = {
-  createOrder: (orderData) => api.post('/orders/create', orderData),
-  getTableOrders: (tableId) => api.get(`/orders/table/${tableId}`),
+  createOrder: (orderData) => customerApi.post('/orders/create', orderData), // No auth for customer orders
+  getTableOrders: (tableId) => customerApi.get(`/orders/table/${tableId}`), // No auth for customer orders
   getRestaurantOrders: (restaurantId, params = {}) => {
     const query = new URLSearchParams(params).toString();
-    return api.get(`/orders/restaurant/${restaurantId}?${query}`);
+    return api.get(`/orders/restaurant/${restaurantId}?${query}`); // Auth required for staff
   },
-  updateOrderStatus: (orderId, status) => api.patch(`/orders/${orderId}/status`, { status }),
-  updateOrderItemStatus: (itemId, status) => api.patch(`/orders/items/${itemId}/status`, { status }),
+  updateOrderStatus: (orderId, status) => api.patch(`/orders/${orderId}/status`, { status }), // Auth required for staff
+  updateOrderItemStatus: (itemId, status) => api.patch(`/orders/items/${itemId}/status`, { status }), // Auth required for staff
 };
 
 // Admin API

@@ -243,3 +243,4 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
 };
 
 export default OrderTracking;
+

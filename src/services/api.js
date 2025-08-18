@@ -50,6 +50,16 @@ const customerApi = axios.create({
   },
 });
 
+// Customer API error handling (NO redirect to login)
+customerApi.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Log customer API errors but don't redirect to login
+    console.log('Customer API error:', error.response?.status, error.response?.data);
+    return Promise.reject(error);
+  }
+);
+
 // Session API (for QR codes and customer sessions)
 export const sessionAPI = {
   openSession: (sessionData) => api.post('/session/open', sessionData),

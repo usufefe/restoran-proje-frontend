@@ -104,7 +104,10 @@ const MenuPage = () => {
           menuItemId: item.menuItemId,
           qty: item.qty,
           notes: item.notes
-        }))
+        })),
+        tenantId,
+        restaurantId,
+        tableId
       };
 
       const response = await ordersAPI.createOrder(orderData);
@@ -161,13 +164,16 @@ const MenuPage = () => {
       <header className="bg-white shadow-sm border-b sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">{menu.restaurant.name}</h1>
-              {session && (
-                <p className="text-sm text-gray-600">
-                  {session.table.name} ({session.table.code})
-                </p>
-              )}
+            <div className="flex items-center">
+              <img src="/pardonbakarmisin logo.png" alt="QR Menü" className="h-8 w-8 mr-3" />
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">{menu.restaurant.name}</h1>
+                {session && (
+                  <p className="text-sm text-gray-600">
+                    {session.table.name} ({session.table.code})
+                  </p>
+                )}
+              </div>
             </div>
             <div className="flex space-x-2">
               <Button

@@ -11,7 +11,7 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <QrCode className="h-8 w-8 text-orange-600 mr-2" />
+              <img src="/pardonbakarmisin logo.png" alt="QR Menü Sistemi" className="h-10 w-10 mr-3" />
               <h1 className="text-2xl font-bold text-gray-900">QR Menü Sistemi</h1>
             </div>
             <Link to="/admin/login">

@@ -19,12 +19,12 @@ const WaiterPanel = () => {
   const [activeTab, setActiveTab] = useState('ready');
 
   useEffect(() => {
-    // Initialize WebSocket connection
-    const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001');
-    setSocket(newSocket);
+    // Initialize WebSocket connection - TEMPORARILY DISABLED
+    // const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001');
+    // setSocket(newSocket);
 
     // Join restaurant room
-    newSocket.emit('join-restaurant', { restaurantId });
+    // newSocket.emit('join-restaurant', { restaurantId });
 
     // Listen for order updates
     newSocket.on('order.updated', (orderData) => {

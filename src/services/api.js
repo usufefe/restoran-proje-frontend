@@ -4,8 +4,16 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 console.log('🔥 VITE_API_URL:', import.meta.env.VITE_API_URL);
 console.log('🎯 API_BASE_URL:', API_BASE_URL);
 
-// Create axios instance
+// Create axios instance for authenticated requests
 const api = axios.create({
+  baseURL: `${API_BASE_URL}/api`,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Create axios instance without auth for customer operations
+const customerApi = axios.create({
   baseURL: `${API_BASE_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
@@ -41,14 +49,6 @@ export const authAPI = {
   me: () => api.get('/auth/me'),
   changePassword: (passwords) => api.post('/auth/change-password', passwords),
 };
-
-// Create axios instance without auth for customer operations
-const customerApi = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
 // Customer API error handling (NO redirect to login)
 customerApi.interceptors.response.use(

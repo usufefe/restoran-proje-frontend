@@ -44,22 +44,25 @@ const WaiterPanel = () => {
 
       // Listen for order updates
       newSocket.on('order.updated', (orderData) => {
-      if (orderData.status === 'READY') {
-        toast({
-          title: "Sipariş Hazır!",
-          description: `Masa ${orderData.tableCode} siparişi servise hazır`,
-        });
-      }
-      loadOrders();
-    });
+        if (orderData.status === 'READY') {
+          toast({
+            title: "Sipariş Hazır!",
+            description: `Masa ${orderData.tableCode} siparişi servise hazır`,
+          });
+        }
+        loadOrders();
+      });
 
-    newSocket.on('order.created', () => {
-      loadOrders();
-    });
+      newSocket.on('order.created', () => {
+        loadOrders();
+      });
 
-    return () => {
-      newSocket.disconnect();
-    };
+      return () => {
+        newSocket.disconnect();
+      };
+    } catch (error) {
+      console.log('WebSocket initialization failed:', error);
+    }
   }, [restaurantId, toast]);
 
   useEffect(() => {

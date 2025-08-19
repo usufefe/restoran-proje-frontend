@@ -49,7 +49,7 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
     return () => {
       newSocket.disconnect();
     };
-  }, [tableId, tenantId, restaurantId, toast]);
+  }, [tableId, tenantId, restaurantId]);
 
   useEffect(() => {
     loadOrders();

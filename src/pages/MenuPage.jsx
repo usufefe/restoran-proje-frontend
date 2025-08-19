@@ -67,7 +67,7 @@ const MenuPage = () => {
     };
 
     initSession();
-  }, [tenantId, restaurantId, tableId, toast]);
+  }, [tenantId, restaurantId, tableId]);
 
   const handleItemClick = (item) => {
     setSelectedItem(item);

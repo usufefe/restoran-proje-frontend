@@ -421,7 +421,7 @@ const AdminDashboard = () => {
               </div>
               
               <div class="footer">
-                <div class="brand">Gastro Admin</div>
+                <div class="brand">PardonChef Admin</div>
                 Premium Restoran Yönetim Sistemi
               </div>
             </div>
@@ -505,7 +505,7 @@ const AdminDashboard = () => {
           
           <div className="bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/20">
             <h3 className="text-2xl font-bold bg-gradient-to-r from-orange-600 via-teal-600 to-purple-600 bg-clip-text text-transparent mb-3">
-              Gastro Admin
+              PardonChef Admin
             </h3>
             <p className="text-gray-600 mb-4">Premium Restoran Yönetim Sistemi</p>
             <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
@@ -536,12 +536,12 @@ const AdminDashboard = () => {
                 <img 
                   src={logoImage} 
                   alt="Logo" 
-                  className="relative w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl shadow-xl ring-2 ring-white/50" 
+                  className="relative w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-xl shadow-xl ring-2 ring-white/50 object-cover object-center" 
                 />
               </div>
               <div className="min-w-0">
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-black bg-gradient-to-r from-orange-600 via-teal-600 to-purple-600 bg-clip-text text-transparent truncate">
-                  Gastro Admin
+                  PardonChef Admin
                 </h1>
                 <p className="text-xs sm:text-sm text-gray-600 font-medium hidden sm:block">Premium Restoran Yönetim Sistemi</p>
               </div>
@@ -685,7 +685,7 @@ const AdminDashboard = () => {
             {/* Premium Overview Tab */}
             <TabsContent value="overview" className="space-y-6 sm:space-y-8 lg:space-y-10">
               {/* Enhanced Stats Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 xl:gap-8">
                 <Card className="border-0 shadow-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 text-white overflow-hidden relative group hover:scale-105 transition-all duration-300">
                   <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
@@ -693,7 +693,7 @@ const AdminDashboard = () => {
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
                     <CardTitle className="text-sm font-semibold opacity-90 flex items-center">
                       <TrendingUp className="h-4 w-4 mr-2" />
-                      Bugünkü Siparişler
+                      Siparişler
                     </CardTitle>
                     <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                       <Target className="h-6 w-6" />
@@ -704,7 +704,6 @@ const AdminDashboard = () => {
                     <p className="text-sm opacity-80 flex items-center">
                       <Sparkles className="h-3 w-3 mr-1 text-green-300" />
                       <span className="text-green-300 font-semibold">+12%</span>
-                      <span className="ml-1">önceki güne göre</span>
                     </p>
                   </CardContent>
                 </Card>
@@ -716,7 +715,7 @@ const AdminDashboard = () => {
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
                     <CardTitle className="text-sm font-semibold opacity-90 flex items-center">
                       <DollarSign className="h-4 w-4 mr-2" />
-                      Günlük Gelir
+                      Gelir
                     </CardTitle>
                     <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                       <Award className="h-6 w-6" />
@@ -727,7 +726,6 @@ const AdminDashboard = () => {
                     <p className="text-sm opacity-80 flex items-center">
                       <Sparkles className="h-3 w-3 mr-1 text-green-300" />
                       <span className="text-green-300 font-semibold">+8%</span>
-                      <span className="ml-1">önceki güne göre</span>
                     </p>
                   </CardContent>
                 </Card>
@@ -739,7 +737,7 @@ const AdminDashboard = () => {
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
                     <CardTitle className="text-sm font-semibold opacity-90 flex items-center">
                       <Users className="h-4 w-4 mr-2" />
-                      Aktif Masalar
+                      Masalar
                     </CardTitle>
                     <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                       <Layers className="h-6 w-6" />
@@ -748,7 +746,7 @@ const AdminDashboard = () => {
                   <CardContent className="relative z-10">
                     <div className="text-4xl font-black mb-2">{tables.filter(table => table.isActive).length}</div>
                     <p className="text-sm opacity-80">
-                      <span className="font-semibold">{tables.length}</span> toplam masa
+                      <span className="font-semibold">{tables.length}</span> toplam
                     </p>
                   </CardContent>
                 </Card>
@@ -760,7 +758,7 @@ const AdminDashboard = () => {
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
                     <CardTitle className="text-sm font-semibold opacity-90 flex items-center">
                       <Star className="h-4 w-4 mr-2" />
-                      Müşteri Puanı
+                      Puan
                     </CardTitle>
                     <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                       <Sparkles className="h-6 w-6" />
@@ -769,7 +767,7 @@ const AdminDashboard = () => {
                   <CardContent className="relative z-10">
                     <div className="text-4xl font-black mb-2">{dashboardStats.avgRating}</div>
                     <p className="text-sm opacity-80">
-                      <span className="font-semibold">5</span> üzerinden ortalama
+                      <span className="font-semibold">5</span> üzerinden
                     </p>
                   </CardContent>
                 </Card>

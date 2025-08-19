@@ -45,11 +45,14 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { adminAPI, sessionAPI } from '../services/api';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { user, logout, isAuthenticated, loading } = useAuth();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const [restaurants, setRestaurants] = useState([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
@@ -68,6 +71,9 @@ const AdminDashboard = () => {
     activeCustomers: 0,
     avgRating: 0
   });
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
+  const [currentQRData, setCurrentQRData] = useState(null);
+  const [qrLoading, setQrLoading] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -174,12 +180,63 @@ const AdminDashboard = () => {
       return;
     }
 
+    setQrLoading(true);
+    
     try {
       const response = await sessionAPI.getQRCode(table.id);
       const qrData = response.data;
       
-      // Open QR code in new window with premium styling
-      const newWindow = window.open('', '_blank', 'width=600,height=800');
+      // Mobil cihazlarda modal kullan, desktop'ta pop-up
+      if (isMobile) {
+        setCurrentQRData({
+          ...qrData,
+          table: table,
+          restaurant: selectedRestaurant
+        });
+        setIsQRModalOpen(true);
+      } else {
+        // Desktop için mevcut pop-up yöntemi
+        openQRPopup(qrData, table, selectedRestaurant);
+      }
+    } catch (error) {
+      console.error('Failed to generate QR code:', error);
+      
+      let errorMessage = "QR kod oluşturulurken bir hata oluştu.";
+      
+      if (error.response?.status === 404) {
+        errorMessage = "Masa bulunamadı. Lütfen masa bilgilerini kontrol edin.";
+      } else if (error.response?.status === 500) {
+        errorMessage = "Sunucu hatası. Lütfen daha sonra tekrar deneyin.";
+      } else if (error.code === 'NETWORK_ERROR' || !error.response) {
+        errorMessage = "İnternet bağlantınızı kontrol edin ve tekrar deneyin.";
+      }
+      
+      toast({
+        title: "QR Kod Hatası",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setQrLoading(false);
+    }
+  };
+
+  const openQRPopup = (qrData, table, restaurant) => {
+    try {
+      // Check if popup blocker might interfere
+      const newWindow = window.open('', '_blank', 'width=600,height=800,scrollbars=yes,resizable=yes');
+      
+      if (!newWindow) {
+        // Popup blocked, fallback to modal
+        setCurrentQRData({
+          ...qrData,
+          table: table,
+          restaurant: restaurant
+        });
+        setIsQRModalOpen(true);
+        return;
+      }
+      
       newWindow.document.write(`
         <html>
           <head>
@@ -381,7 +438,7 @@ const AdminDashboard = () => {
             <div class="qr-container">
               <div class="header-section">
                 <div class="restaurant-logo">🍽️</div>
-                <h1>${selectedRestaurant.name}</h1>
+                <h1>${restaurant.name}</h1>
                 <h2>${table.name} • ${table.code}</h2>
               </div>
               
@@ -415,7 +472,7 @@ const AdminDashboard = () => {
                 <button onclick="window.print()" class="print-btn">
                   🖨️ Yazdır
                 </button>
-                <button onclick="navigator.share ? navigator.share({title: '${selectedRestaurant.name} - ${table.name}', url: window.location.href}) : alert('Paylaşım desteklenmiyor')" class="share-btn">
+                <button onclick="navigator.share ? navigator.share({title: '${restaurant.name} - ${table.name}', url: window.location.href}) : alert('Paylaşım desteklenmiyor')" class="share-btn">
                   📤 Paylaş
                 </button>
               </div>
@@ -430,12 +487,14 @@ const AdminDashboard = () => {
       `);
       newWindow.document.close();
     } catch (error) {
-      console.error('Failed to generate QR code:', error);
-      toast({
-        title: "Hata",
-        description: "QR kod oluşturulurken bir hata oluştu.",
-        variant: "destructive",
+      console.error('Failed to open QR popup:', error);
+      // Fallback to modal if popup fails
+      setCurrentQRData({
+        ...qrData,
+        table: table,
+        restaurant: restaurant
       });
+      setIsQRModalOpen(true);
     }
   };
 
@@ -960,10 +1019,15 @@ const AdminDashboard = () => {
                           variant="outline"
                           size="lg"
                           onClick={() => handleViewQR(table)}
-                          className="w-full border-2 border-orange-200 text-orange-600 hover:bg-gradient-to-r hover:from-orange-500 hover:to-teal-500 hover:text-white hover:border-transparent group-hover:border-orange-300 transition-all duration-300 py-3 sm:py-4 text-sm sm:text-base"
+                          disabled={qrLoading}
+                          className="w-full border-2 border-orange-200 text-orange-600 hover:bg-gradient-to-r hover:from-orange-500 hover:to-teal-500 hover:text-white hover:border-transparent group-hover:border-orange-300 transition-all duration-300 py-3 sm:py-4 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <Eye className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                          QR Kodu Görüntüle
+                          {qrLoading ? (
+                            <RefreshCw className="h-4 w-4 sm:h-5 sm:w-5 mr-2 animate-spin" />
+                          ) : (
+                            <Eye className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                          )}
+                          {qrLoading ? 'QR Kod Hazırlanıyor...' : 'QR Kodu Görüntüle'}
                         </Button>
                         <div className="pt-3 sm:pt-4 border-t border-gray-200">
                           <div className="flex items-center justify-between text-xs sm:text-sm">
@@ -1229,6 +1293,112 @@ const AdminDashboard = () => {
           menuItem={selectedMenuItem}
           onMenuItemUpdated={handleMenuItemUpdated}
         />
+
+        {/* QR Code Modal for Mobile & Desktop */}
+        <Dialog open={isQRModalOpen} onOpenChange={setIsQRModalOpen}>
+          <DialogContent className="max-w-[95vw] sm:max-w-md mx-auto bg-gradient-to-br from-white via-orange-50/30 to-teal-50/30 border-0 shadow-2xl overflow-hidden max-h-[95vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-center text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-orange-600 to-teal-600 bg-clip-text text-transparent px-2">
+                📱 QR Kod - {currentQRData?.table?.name}
+              </DialogTitle>
+            </DialogHeader>
+            {currentQRData && (
+              <div className="space-y-3 sm:space-y-4 lg:space-y-6 py-2 sm:py-4 px-2 sm:px-4">
+                {/* Restaurant Info */}
+                <div className="text-center">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 sm:mb-3 bg-gradient-to-br from-orange-500 to-teal-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl">
+                    <span className="text-xl sm:text-2xl">🍽️</span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-gray-800 truncate px-2">{currentQRData.restaurant?.name}</h3>
+                  <p className="text-sm sm:text-base text-orange-600 font-semibold truncate px-2">{currentQRData.table?.name} • {currentQRData.table?.code}</p>
+                </div>
+
+                {/* QR Code */}
+                <div className="bg-white p-3 sm:p-4 lg:p-6 rounded-xl sm:rounded-2xl shadow-lg border-2 border-orange-100">
+                  <div className="relative mx-auto" style={{maxWidth: '280px'}}>
+                    <img 
+                      src={currentQRData.qrCodeImage} 
+                      alt="QR Kod" 
+                      className="w-full h-auto rounded-lg sm:rounded-xl shadow-md"
+                      style={{
+                        minHeight: '200px',
+                        objectFit: 'contain'
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Instructions */}
+                <div className="bg-gradient-to-r from-orange-500 to-teal-500 text-white p-3 sm:p-4 rounded-lg sm:rounded-xl text-center mx-2 sm:mx-0">
+                  <p className="text-xs sm:text-sm font-medium leading-relaxed">
+                    📱 <strong>Dijital Menü Erişimi</strong><br/>
+                    Müşteriler bu QR kodu okuyarak<br className="hidden sm:inline"/>
+                    dijital menüye erişebilir
+                  </p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-2 sm:gap-3 px-2 sm:px-0">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <Button
+                      onClick={() => {
+                        if (navigator.share) {
+                          navigator.share({
+                            title: `${currentQRData.restaurant?.name} - ${currentQRData.table?.name}`,
+                            text: 'QR Menü',
+                            url: currentQRData.qrUrl
+                          }).catch(err => {
+                            // Fallback to clipboard
+                            navigator.clipboard.writeText(currentQRData.qrUrl);
+                            toast({
+                              title: "Başarılı",
+                              description: "QR kod linki kopyalandı!",
+                            });
+                          });
+                        } else {
+                          navigator.clipboard.writeText(currentQRData.qrUrl);
+                          toast({
+                            title: "Başarılı", 
+                            description: "QR kod linki kopyalandı!",
+                          });
+                        }
+                      }}
+                      className="flex-1 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white text-sm sm:text-base py-2 sm:py-3"
+                    >
+                      📤 Paylaş / Kopyala
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        // Mobile'da download özelliği ekle
+                        if (isMobile) {
+                          const link = document.createElement('a');
+                          link.href = currentQRData.qrCodeImage;
+                          link.download = `QR-${currentQRData.table?.name}-${currentQRData.restaurant?.name}.png`;
+                          link.click();
+                        } else {
+                          window.print();
+                        }
+                      }}
+                      variant="outline"
+                      className="flex-1 border-2 border-orange-200 text-orange-600 hover:bg-orange-50 text-sm sm:text-base py-2 sm:py-3"
+                    >
+                      {isMobile ? '💾 İndir' : '🖨️ Yazdır'}
+                    </Button>
+                  </div>
+
+                  {/* Close Button */}
+                  <Button
+                    onClick={() => setIsQRModalOpen(false)}
+                    variant="outline"
+                    className="w-full border-gray-300 text-gray-600 hover:bg-gray-50 text-sm sm:text-base py-2 sm:py-3"
+                  >
+                    Kapat
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );

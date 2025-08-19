@@ -17,6 +17,29 @@ const KitchenDisplay = () => {
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState(null);
 
+  // loadOrders fonksiyonunu useEffect'lerden önce tanımla
+  const loadOrders = useCallback(async () => {
+    try {
+      console.log('🔍 Kitchen: Siparişler yükleniyor...', { restaurantId });
+      const response = await ordersAPI.getRestaurantOrders(restaurantId, {
+        status: 'PENDING,IN_PROGRESS',
+        limit: 20
+      });
+      console.log('✅ Kitchen: Siparişler yüklendi:', response.data);
+      setOrders(response.data);
+    } catch (error) {
+      console.error('❌ Kitchen: Sipariş yükleme hatası:', error);
+      console.error('❌ Kitchen: Hata detayı:', error.response?.data);
+      toast({
+        title: "Hata",
+        description: `Siparişler yüklenirken bir hata oluştu: ${error.response?.data?.message || error.message}`,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [restaurantId, toast]);
+
   // WebSocket için ayrı useEffect - loadOrders'dan sonra çalışsın
   useEffect(() => {
     if (!restaurantId || !socket) return;
@@ -89,28 +112,19 @@ const KitchenDisplay = () => {
     };
   }, [restaurantId]); // SADECE restaurantId değiştiğinde yeniden bağlan
 
-  const loadOrders = useCallback(async () => {
-    try {
-      const response = await ordersAPI.getRestaurantOrders(restaurantId, {
-        status: 'PENDING,IN_PROGRESS',
-        limit: 20
-      });
-      setOrders(response.data);
-    } catch (error) {
-      console.error('Failed to load orders:', error);
-      toast({
-        title: "Hata",
-        description: "Siparişler yüklenirken bir hata oluştu.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [restaurantId, toast]);
-
   useEffect(() => {
+    if (!restaurantId) return;
+    
+    // İlk yüklemede hemen çağır
     loadOrders();
-  }, [loadOrders]);
+    
+    // 10 saniyede bir yenile
+    const interval = setInterval(() => {
+      loadOrders();
+    }, 10000); // 10 saniye
+    
+    return () => clearInterval(interval);
+  }, [restaurantId]); // Sadece restaurantId değiştiğinde yeniden başlat
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {

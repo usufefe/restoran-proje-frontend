@@ -19,6 +19,28 @@ const WaiterPanel = () => {
   const [socket, setSocket] = useState(null);
   const [activeTab, setActiveTab] = useState('ready');
 
+  // loadOrders fonksiyonunu useEffect'lerden önce tanımla
+  const loadOrders = useCallback(async () => {
+    try {
+      console.log('🔍 Waiter: Siparişler yükleniyor...', { restaurantId });
+      const response = await ordersAPI.getRestaurantOrders(restaurantId, {
+        limit: 50
+      });
+      console.log('✅ Waiter: Siparişler yüklendi:', response.data);
+      setOrders(response.data);
+    } catch (error) {
+      console.error('❌ Waiter: Sipariş yükleme hatası:', error);
+      console.error('❌ Waiter: Hata detayı:', error.response?.data);
+      toast({
+        title: "Hata",
+        description: `Siparişler yüklenirken bir hata oluştu: ${error.response?.data?.message || error.message}`,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [restaurantId, toast]);
+
   // WebSocket için ayrı useEffect - loadOrders'dan sonra çalışsın
   useEffect(() => {
     if (!restaurantId || !socket) return;
@@ -87,26 +109,18 @@ const WaiterPanel = () => {
   }, [restaurantId]); // SADECE restaurantId değiştiğinde yeniden bağlan
 
   useEffect(() => {
+    if (!restaurantId) return;
+    
+    // İlk yüklemede hemen çağır
     loadOrders();
-  }, [loadOrders]);
-
-  const loadOrders = useCallback(async () => {
-    try {
-      const response = await ordersAPI.getRestaurantOrders(restaurantId, {
-        limit: 50
-      });
-      setOrders(response.data);
-    } catch (error) {
-      console.error('Failed to load orders:', error);
-      toast({
-        title: "Hata",
-        description: "Siparişler yüklenirken bir hata oluştu.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [restaurantId, toast]);
+    
+    // 10 saniyede bir yenile
+    const interval = setInterval(() => {
+      loadOrders();
+    }, 10000); // 10 saniye
+    
+    return () => clearInterval(interval);
+  }, [restaurantId]); // Sadece restaurantId değiştiğinde yeniden başlat
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {

@@ -484,68 +484,70 @@ const AdminDashboard = () => {
       {/* Premium Header */}
       <header className="bg-white/90 backdrop-blur-xl shadow-2xl border-b border-white/20 sticky top-0 z-50 relative">
         <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-teal-500/5"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="flex justify-between items-center h-24">
-            <div className="flex items-center space-x-6">
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-teal-500 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
-                <img 
-                  src={logoImage} 
-                  alt="Logo" 
-                  className="relative w-16 h-16 rounded-xl shadow-xl ring-2 ring-white/50" 
-                />
-              </div>
-              <div>
-                <h1 className="text-3xl font-black bg-gradient-to-r from-orange-600 via-teal-600 to-purple-600 bg-clip-text text-transparent">
-                  Gastro Admin
-                </h1>
-                <p className="text-sm text-gray-600 font-medium">Premium Restoran Yönetim Sistemi</p>
-              </div>
-            </div>
+                 <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 relative">
+           <div className="flex justify-between items-center h-16 sm:h-20 lg:h-24">
+             <div className="flex items-center space-x-2 sm:space-x-4 lg:space-x-6">
+               <div className="relative group">
+                 <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-teal-500 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+                 <img 
+                   src={logoImage} 
+                   alt="Logo" 
+                   className="relative w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16 rounded-xl shadow-xl ring-2 ring-white/50" 
+                 />
+               </div>
+               <div>
+                 <h1 className="text-lg sm:text-2xl lg:text-3xl font-black bg-gradient-to-r from-orange-600 via-teal-600 to-purple-600 bg-clip-text text-transparent">
+                   <span className="hidden sm:inline">Gastro Admin</span>
+                   <span className="sm:hidden">Admin</span>
+                 </h1>
+                 <p className="text-xs sm:text-sm text-gray-600 font-medium hidden sm:block">Premium Restoran Yönetim Sistemi</p>
+               </div>
+             </div>
             
-            <div className="flex items-center space-x-8">
-              {/* Enhanced Notification Area */}
-              <div className="hidden lg:flex items-center space-x-4">
-                <Button variant="ghost" size="sm" className="relative group">
-                  <Bell className="h-5 w-5 text-gray-600 group-hover:text-orange-500 transition-colors" />
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-red-500 to-pink-500 rounded-full text-xs flex items-center justify-center text-white font-bold animate-pulse">3</span>
-                </Button>
-                <Button variant="ghost" size="sm" className="group">
-                  <Search className="h-5 w-5 text-gray-600 group-hover:text-teal-500 transition-colors" />
-                </Button>
-                <Button variant="ghost" size="sm" className="group">
-                  <Activity className="h-5 w-5 text-gray-600 group-hover:text-purple-500 transition-colors" />
-                </Button>
-              </div>
-              
-              {/* Premium User Section */}
-              <div className="flex items-center space-x-4 pl-6 border-l border-gray-200/50">
-                <div className="text-right hidden sm:block">
-                  <p className="text-sm font-semibold text-gray-800">Hoş geldin,</p>
-                  <p className="text-xs text-gray-500 font-medium">{user?.name}</p>
-                </div>
-                <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-teal-500 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-300"></div>
-                  <div className="relative w-12 h-12 bg-gradient-to-br from-orange-400 via-teal-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-xl">
-                    {user?.name?.charAt(0)?.toUpperCase()}
-                  </div>
-                </div>
-                <Badge 
-                  variant={user?.role === 'ADMIN' ? 'default' : 'secondary'}
-                  className="bg-gradient-to-r from-orange-500 via-teal-500 to-purple-500 text-white border-0 px-3 py-1 font-semibold shadow-lg"
-                >
-                  <Shield className="h-3 w-3 mr-1" />
-                  {user?.role}
-                </Badge>
-                <Button 
-                  variant="outline" 
-                  onClick={handleLogout}
-                  className="border-2 border-orange-200 text-orange-600 hover:bg-gradient-to-r hover:from-orange-500 hover:to-teal-500 hover:text-white hover:border-transparent transition-all duration-300 shadow-lg"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Çıkış Yap
-                </Button>
-              </div>
+                         <div className="flex items-center space-x-2 sm:space-x-4 lg:space-x-8">
+               {/* Mobile-Hidden Notification Area */}
+               <div className="hidden lg:flex items-center space-x-4">
+                 <Button variant="ghost" size="sm" className="relative group">
+                   <Bell className="h-5 w-5 text-gray-600 group-hover:text-orange-500 transition-colors" />
+                   <span className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-red-500 to-pink-500 rounded-full text-xs flex items-center justify-center text-white font-bold animate-pulse">3</span>
+                 </Button>
+                 <Button variant="ghost" size="sm" className="group">
+                   <Search className="h-5 w-5 text-gray-600 group-hover:text-teal-500 transition-colors" />
+                 </Button>
+                 <Button variant="ghost" size="sm" className="group">
+                   <Activity className="h-5 w-5 text-gray-600 group-hover:text-purple-500 transition-colors" />
+                 </Button>
+               </div>
+               
+               {/* Mobile-Optimized User Section */}
+               <div className="flex items-center space-x-2 sm:space-x-4 pl-2 sm:pl-6 border-l border-gray-200/50">
+                 <div className="text-right hidden md:block">
+                   <p className="text-sm font-semibold text-gray-800">Hoş geldin,</p>
+                   <p className="text-xs text-gray-500 font-medium">{user?.name}</p>
+                 </div>
+                 <div className="relative group">
+                   <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-teal-500 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-300"></div>
+                   <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-orange-400 via-teal-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-base lg:text-lg shadow-xl">
+                     {user?.name?.charAt(0)?.toUpperCase()}
+                   </div>
+                 </div>
+                 <Badge 
+                   variant={user?.role === 'ADMIN' ? 'default' : 'secondary'}
+                   className="bg-gradient-to-r from-orange-500 via-teal-500 to-purple-500 text-white border-0 px-2 py-1 sm:px-3 text-xs sm:text-sm font-semibold shadow-lg"
+                 >
+                   <Shield className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
+                   <span className="hidden sm:inline">{user?.role}</span>
+                   <span className="sm:hidden">{user?.role === 'ADMIN' ? 'A' : 'U'}</span>
+                 </Badge>
+                 <Button 
+                   variant="outline" 
+                   onClick={handleLogout}
+                   className="border-2 border-orange-200 text-orange-600 hover:bg-gradient-to-r hover:from-orange-500 hover:to-teal-500 hover:text-white hover:border-transparent transition-all duration-300 shadow-lg px-2 sm:px-4 py-1 sm:py-2"
+                 >
+                   <LogOut className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                   <span className="hidden sm:inline">Çıkış Yap</span>
+                 </Button>
+               </div>
             </div>
           </div>
         </div>
@@ -601,134 +603,138 @@ const AdminDashboard = () => {
 
         {selectedRestaurant && (
           <Tabs defaultValue="overview" className="w-full">
-                         {/* Responsive Tab Navigation */}
-             <TabsList className="grid w-full grid-cols-4 bg-white/60 backdrop-blur-xl border-2 border-white/20 rounded-2xl p-2 mb-10 shadow-2xl">
+                         {/* Ultra Mobile-Friendly Tab Navigation */}
+             <TabsList className="grid w-full grid-cols-4 bg-white/60 backdrop-blur-xl border-2 border-white/20 rounded-2xl p-1 mb-10 shadow-2xl">
                <TabsTrigger 
                  value="overview" 
-                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-xl rounded-xl font-semibold transition-all duration-300 py-3 px-2 text-sm"
+                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-xl rounded-xl font-semibold transition-all duration-300 py-2 px-1 text-xs sm:text-sm sm:py-3 sm:px-2 flex flex-col items-center justify-center min-h-[3rem]"
                >
-                 <BarChart3 className="h-4 w-4 sm:mr-2" />
-                 <span className="hidden sm:inline">Genel Bakış</span>
-                 <span className="sm:hidden">Genel</span>
+                 <BarChart3 className="h-4 w-4" />
+                 <span className="mt-1 hidden sm:inline">Genel Bakış</span>
+                 <span className="mt-1 sm:hidden text-[10px]">Genel</span>
                </TabsTrigger>
                <TabsTrigger 
                  value="tables"
-                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-xl rounded-xl font-semibold transition-all duration-300 py-3 px-2 text-sm"
+                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-xl rounded-xl font-semibold transition-all duration-300 py-2 px-1 text-xs sm:text-sm sm:py-3 sm:px-2 flex flex-col items-center justify-center min-h-[3rem]"
                >
-                 <QrCode className="h-4 w-4 sm:mr-2" />
-                 <span className="hidden sm:inline">Masalar</span>
-                 <span className="sm:hidden">Masa</span>
+                 <QrCode className="h-4 w-4" />
+                 <span className="mt-1 hidden sm:inline">Masalar</span>
+                 <span className="mt-1 sm:hidden text-[10px]">Masa</span>
                </TabsTrigger>
                <TabsTrigger 
                  value="menu"
-                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-xl rounded-xl font-semibold transition-all duration-300 py-3 px-2 text-sm"
+                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-xl rounded-xl font-semibold transition-all duration-300 py-2 px-1 text-xs sm:text-sm sm:py-3 sm:px-2 flex flex-col items-center justify-center min-h-[3rem]"
                >
-                 <ChefHat className="h-4 w-4 sm:mr-2" />
-                 <span className="hidden sm:inline">Menü</span>
-                 <span className="sm:hidden">Menü</span>
+                 <ChefHat className="h-4 w-4" />
+                 <span className="mt-1 hidden sm:inline">Menü</span>
+                 <span className="mt-1 sm:hidden text-[10px]">Menü</span>
                </TabsTrigger>
                {user?.role === 'ADMIN' && (
                  <TabsTrigger 
                    value="users"
-                   className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-xl rounded-xl font-semibold transition-all duration-300 py-3 px-2 text-sm"
+                   className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-xl rounded-xl font-semibold transition-all duration-300 py-2 px-1 text-xs sm:text-sm sm:py-3 sm:px-2 flex flex-col items-center justify-center min-h-[3rem]"
                  >
-                   <Users className="h-4 w-4 sm:mr-2" />
-                   <span className="hidden sm:inline">Kullanıcılar</span>
-                   <span className="sm:hidden">User</span>
+                   <Users className="h-4 w-4" />
+                   <span className="mt-1 hidden sm:inline">Kullanıcılar</span>
+                   <span className="mt-1 sm:hidden text-[10px]">User</span>
                  </TabsTrigger>
                )}
             </TabsList>
 
             {/* Premium Overview Tab */}
             <TabsContent value="overview" className="space-y-10">
-              {/* Enhanced Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                             {/* Mobile-Optimized Stats Cards */}
+               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
                 <Card className="border-0 shadow-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 text-white overflow-hidden relative group hover:scale-105 transition-all duration-300">
                   <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
                   <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-12 -mb-12"></div>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-                    <CardTitle className="text-sm font-semibold opacity-90 flex items-center">
-                      <TrendingUp className="h-4 w-4 mr-2" />
-                      Bugünkü Siparişler
-                    </CardTitle>
-                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                      <Target className="h-6 w-6" />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="relative z-10">
-                    <div className="text-4xl font-black mb-2">{dashboardStats.todayOrders}</div>
-                    <p className="text-sm opacity-80 flex items-center">
-                      <Sparkles className="h-3 w-3 mr-1 text-green-300" />
-                      <span className="text-green-300 font-semibold">+12%</span>
-                      <span className="ml-1">önceki güne göre</span>
-                    </p>
-                  </CardContent>
+                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+                     <CardTitle className="text-xs sm:text-sm font-semibold opacity-90 flex items-center">
+                       <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                       <span className="hidden sm:inline">Bugünkü Siparişler</span>
+                       <span className="sm:hidden">Sipariş</span>
+                     </CardTitle>
+                     <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                       <Target className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6" />
+                     </div>
+                   </CardHeader>
+                   <CardContent className="relative z-10 p-3 sm:p-6">
+                     <div className="text-2xl sm:text-3xl lg:text-4xl font-black mb-1 sm:mb-2">{dashboardStats.todayOrders}</div>
+                     <p className="text-xs sm:text-sm opacity-80 flex items-center">
+                       <Sparkles className="h-2 w-2 sm:h-3 sm:w-3 mr-1 text-green-300" />
+                       <span className="text-green-300 font-semibold">+12%</span>
+                       <span className="ml-1 hidden sm:inline">önceki güne göre</span>
+                     </p>
+                   </CardContent>
                 </Card>
 
                 <Card className="border-0 shadow-2xl bg-gradient-to-br from-emerald-500 via-green-600 to-teal-600 text-white overflow-hidden relative group hover:scale-105 transition-all duration-300">
                   <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
                   <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-12 -mb-12"></div>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-                    <CardTitle className="text-sm font-semibold opacity-90 flex items-center">
-                      <DollarSign className="h-4 w-4 mr-2" />
-                      Günlük Gelir
-                    </CardTitle>
-                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                      <Award className="h-6 w-6" />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="relative z-10">
-                    <div className="text-4xl font-black mb-2">₺{dashboardStats.todayRevenue.toLocaleString()}</div>
-                    <p className="text-sm opacity-80 flex items-center">
-                      <Sparkles className="h-3 w-3 mr-1 text-green-300" />
-                      <span className="text-green-300 font-semibold">+8%</span>
-                      <span className="ml-1">önceki güne göre</span>
-                    </p>
-                  </CardContent>
+                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+                     <CardTitle className="text-xs sm:text-sm font-semibold opacity-90 flex items-center">
+                       <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                       <span className="hidden sm:inline">Günlük Gelir</span>
+                       <span className="sm:hidden">Gelir</span>
+                     </CardTitle>
+                     <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                       <Award className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6" />
+                     </div>
+                   </CardHeader>
+                   <CardContent className="relative z-10 p-3 sm:p-6">
+                     <div className="text-xl sm:text-3xl lg:text-4xl font-black mb-1 sm:mb-2">₺{dashboardStats.todayRevenue.toLocaleString()}</div>
+                     <p className="text-xs sm:text-sm opacity-80 flex items-center">
+                       <Sparkles className="h-2 w-2 sm:h-3 sm:w-3 mr-1 text-green-300" />
+                       <span className="text-green-300 font-semibold">+8%</span>
+                       <span className="ml-1 hidden sm:inline">önceki güne göre</span>
+                     </p>
+                   </CardContent>
                 </Card>
 
                 <Card className="border-0 shadow-2xl bg-gradient-to-br from-orange-500 via-red-500 to-pink-600 text-white overflow-hidden relative group hover:scale-105 transition-all duration-300">
                   <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
                   <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-12 -mb-12"></div>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-                    <CardTitle className="text-sm font-semibold opacity-90 flex items-center">
-                      <Users className="h-4 w-4 mr-2" />
-                      Aktif Masalar
-                    </CardTitle>
-                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                      <Layers className="h-6 w-6" />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="relative z-10">
-                    <div className="text-4xl font-black mb-2">{tables.filter(table => table.isActive).length}</div>
-                    <p className="text-sm opacity-80">
-                      <span className="font-semibold">{tables.length}</span> toplam masa
-                    </p>
-                  </CardContent>
+                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+                     <CardTitle className="text-xs sm:text-sm font-semibold opacity-90 flex items-center">
+                       <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                       <span className="hidden sm:inline">Aktif Masalar</span>
+                       <span className="sm:hidden">Masa</span>
+                     </CardTitle>
+                     <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                       <Layers className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6" />
+                     </div>
+                   </CardHeader>
+                   <CardContent className="relative z-10 p-3 sm:p-6">
+                     <div className="text-2xl sm:text-3xl lg:text-4xl font-black mb-1 sm:mb-2">{tables.filter(table => table.isActive).length}</div>
+                     <p className="text-xs sm:text-sm opacity-80">
+                       <span className="font-semibold">{tables.length}</span> <span className="hidden sm:inline">toplam masa</span>
+                     </p>
+                   </CardContent>
                 </Card>
 
                 <Card className="border-0 shadow-2xl bg-gradient-to-br from-purple-500 via-violet-600 to-indigo-600 text-white overflow-hidden relative group hover:scale-105 transition-all duration-300">
                   <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
                   <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-12 -mb-12"></div>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-                    <CardTitle className="text-sm font-semibold opacity-90 flex items-center">
-                      <Star className="h-4 w-4 mr-2" />
-                      Müşteri Puanı
-                    </CardTitle>
-                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                      <Sparkles className="h-6 w-6" />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="relative z-10">
-                    <div className="text-4xl font-black mb-2">{dashboardStats.avgRating}</div>
-                    <p className="text-sm opacity-80">
-                      <span className="font-semibold">5</span> üzerinden ortalama
-                    </p>
-                  </CardContent>
+                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+                     <CardTitle className="text-xs sm:text-sm font-semibold opacity-90 flex items-center">
+                       <Star className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                       <span className="hidden sm:inline">Müşteri Puanı</span>
+                       <span className="sm:hidden">Puan</span>
+                     </CardTitle>
+                     <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                       <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6" />
+                     </div>
+                   </CardHeader>
+                   <CardContent className="relative z-10 p-3 sm:p-6">
+                     <div className="text-2xl sm:text-3xl lg:text-4xl font-black mb-1 sm:mb-2">{dashboardStats.avgRating}</div>
+                     <p className="text-xs sm:text-sm opacity-80">
+                       <span className="font-semibold">5</span> <span className="hidden sm:inline">üzerinden ortalama</span>
+                     </p>
+                   </CardContent>
                 </Card>
               </div>
 
@@ -751,24 +757,30 @@ const AdminDashboard = () => {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-8 relative">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <Button
-                      onClick={() => navigate(`/kitchen/${selectedRestaurant.id}`)}
-                      className="h-24 bg-gradient-to-br from-red-500 via-red-600 to-pink-600 hover:from-red-600 hover:via-red-700 hover:to-pink-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 flex-col space-y-3 group relative overflow-hidden"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      <ChefHat className="h-8 w-8 relative z-10" />
-                      <span className="font-bold text-lg relative z-10">Mutfak Ekranı</span>
-                    </Button>
-                    <Button
-                      onClick={() => navigate(`/waiter/${selectedRestaurant.id}`)}
-                      className="h-24 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 hover:from-blue-600 hover:via-blue-700 hover:to-indigo-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 flex-col space-y-3 group relative overflow-hidden"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      <Users className="h-8 w-8 relative z-10" />
-                      <span className="font-bold text-lg relative z-10">Garson Paneli</span>
-                    </Button>
+                                 <CardContent className="space-y-6 sm:space-y-8 relative p-4 sm:p-6">
+                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+                                         <Button
+                       onClick={() => navigate(`/kitchen/${selectedRestaurant.id}`)}
+                       className="h-16 sm:h-20 lg:h-24 bg-gradient-to-br from-red-500 via-red-600 to-pink-600 hover:from-red-600 hover:via-red-700 hover:to-pink-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 flex-col space-y-1 sm:space-y-2 lg:space-y-3 group relative overflow-hidden"
+                     >
+                       <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                       <ChefHat className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 relative z-10" />
+                       <span className="font-bold text-xs sm:text-sm lg:text-lg relative z-10">
+                         <span className="hidden sm:inline">Mutfak Ekranı</span>
+                         <span className="sm:hidden">Mutfak</span>
+                       </span>
+                     </Button>
+                                         <Button
+                       onClick={() => navigate(`/waiter/${selectedRestaurant.id}`)}
+                       className="h-16 sm:h-20 lg:h-24 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 hover:from-blue-600 hover:via-blue-700 hover:to-indigo-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 flex-col space-y-1 sm:space-y-2 lg:space-y-3 group relative overflow-hidden"
+                     >
+                       <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                       <Users className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8 relative z-10" />
+                       <span className="font-bold text-xs sm:text-sm lg:text-lg relative z-10">
+                         <span className="hidden sm:inline">Garson Paneli</span>
+                         <span className="sm:hidden">Garson</span>
+                       </span>
+                     </Button>
                     <Button
                       variant="outline"
                       onClick={() => {
@@ -782,17 +794,23 @@ const AdminDashboard = () => {
                           });
                         }
                       }}
-                      className="h-24 border-4 border-orange-200 hover:bg-gradient-to-br hover:from-orange-500 hover:to-orange-600 text-orange-600 hover:text-white hover:border-transparent shadow-2xl hover:shadow-3xl transition-all duration-300 flex-col space-y-3 group"
-                    >
-                      <QrCode className="h-8 w-8" />
-                      <span className="font-bold text-lg">Demo Menü</span>
+                                             className="h-16 sm:h-20 lg:h-24 border-2 sm:border-4 border-orange-200 hover:bg-gradient-to-br hover:from-orange-500 hover:to-orange-600 text-orange-600 hover:text-white hover:border-transparent shadow-2xl hover:shadow-3xl transition-all duration-300 flex-col space-y-1 sm:space-y-2 lg:space-y-3 group"
+                     >
+                       <QrCode className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8" />
+                       <span className="font-bold text-xs sm:text-sm lg:text-lg">
+                         <span className="hidden sm:inline">Demo Menü</span>
+                         <span className="sm:hidden">Demo</span>
+                       </span>
                     </Button>
                     <Button
                       variant="outline"
-                      className="h-24 border-4 border-teal-200 hover:bg-gradient-to-br hover:from-teal-500 hover:to-teal-600 text-teal-600 hover:text-white hover:border-transparent shadow-2xl hover:shadow-3xl transition-all duration-300 flex-col space-y-3 group"
-                    >
-                      <BarChart3 className="h-8 w-8" />
-                      <span className="font-bold text-lg">Raporlar</span>
+                                             className="h-16 sm:h-20 lg:h-24 border-2 sm:border-4 border-teal-200 hover:bg-gradient-to-br hover:from-teal-500 hover:to-teal-600 text-teal-600 hover:text-white hover:border-transparent shadow-2xl hover:shadow-3xl transition-all duration-300 flex-col space-y-1 sm:space-y-2 lg:space-y-3 group"
+                     >
+                       <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6 lg:h-8 lg:w-8" />
+                       <span className="font-bold text-xs sm:text-sm lg:text-lg">
+                         <span className="hidden sm:inline">Raporlar</span>
+                         <span className="sm:hidden">Rapor</span>
+                       </span>
                     </Button>
                   </div>
                 </CardContent>

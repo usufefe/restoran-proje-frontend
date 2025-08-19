@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,15 +17,40 @@ const KitchenDisplay = () => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    // Initialize WebSocket connection
-    const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001');
+    if (!restaurantId) return;
+    
+    console.log('🔌 WebSocket bağlantısı kuruluyor...');
+    
+    // Initialize WebSocket connection with better config
+    const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001', {
+      transports: ['websocket', 'polling'],
+      timeout: 5000,
+      forceNew: true,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000
+    });
+    
     setSocket(newSocket);
 
-    // Join kitchen room
-    newSocket.emit('join-kitchen', { restaurantId, station: 'HOT' });
+    // Connection handlers
+    newSocket.on('connect', () => {
+      console.log('✅ WebSocket bağlandı:', newSocket.id);
+      // Join kitchen room after connection
+      newSocket.emit('join-kitchen', { restaurantId, station: 'HOT' });
+    });
+
+    newSocket.on('connect_error', (error) => {
+      console.error('❌ WebSocket bağlantı hatası:', error);
+    });
+
+    newSocket.on('disconnect', (reason) => {
+      console.log('🔌 WebSocket bağlantısı kesildi:', reason);
+    });
 
     // Listen for new orders
     newSocket.on('order.created', (orderData) => {
+      console.log('🆕 Yeni sipariş geldi:', orderData);
       toast({
         title: "Yeni Sipariş!",
         description: `Masa ${orderData.tableCode} - ${orderData.itemCount} ürün`,
@@ -35,6 +60,7 @@ const KitchenDisplay = () => {
 
     // Listen for order updates
     newSocket.on('order.updated', (orderData) => {
+      console.log('🔄 Sipariş güncellendi:', orderData);
       setOrders(prevOrders =>
         prevOrders.map(order =>
           order.id === orderData.orderId
@@ -44,16 +70,19 @@ const KitchenDisplay = () => {
       );
     });
 
+    // Cleanup function
     return () => {
+      console.log('🧹 WebSocket temizleniyor...');
+      newSocket.removeAllListeners();
       newSocket.disconnect();
     };
-  }, [restaurantId, toast]);
+  }, [restaurantId]); // SADECE restaurantId değiştiğinde yeniden bağlan
 
   useEffect(() => {
     loadOrders();
-  }, [restaurantId]);
+  }, [loadOrders]);
 
-  const loadOrders = async () => {
+  const loadOrders = useCallback(async () => {
     try {
       const response = await ordersAPI.getRestaurantOrders(restaurantId, {
         status: 'PENDING,IN_PROGRESS',
@@ -70,7 +99,7 @@ const KitchenDisplay = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [restaurantId, toast]);
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {

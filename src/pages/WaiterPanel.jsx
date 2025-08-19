@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,54 +19,61 @@ const WaiterPanel = () => {
   const [activeTab, setActiveTab] = useState('ready');
 
   useEffect(() => {
+    if (!restaurantId) return;
+    
+    console.log('🔌 Waiter WebSocket bağlantısı kuruluyor...');
+    
     // Initialize WebSocket connection with error handling
-    try {
-      const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001', {
-        transports: ['websocket', 'polling'],
-        timeout: 5000,
-        autoConnect: false
-      });
-      
-      // Error handling
-      newSocket.on('connect_error', (error) => {
-        console.log('WebSocket connection failed:', error);
-      });
+    const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001', {
+      transports: ['websocket', 'polling'],
+      timeout: 5000,
+      forceNew: true,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000
+    });
+    
+    setSocket(newSocket);
 
-      newSocket.on('disconnect', (reason) => {
-        console.log('WebSocket disconnected:', reason);
-      });
-
-      newSocket.connect();
-      setSocket(newSocket);
-
-      // Join restaurant room
+    // Connection handlers
+    newSocket.on('connect', () => {
+      console.log('✅ Waiter WebSocket bağlandı:', newSocket.id);
+      // Join restaurant room after connection
       newSocket.emit('join-restaurant', { restaurantId });
+    });
 
-      // Listen for order updates
-      newSocket.on('order.updated', (orderData) => {
-        if (orderData.status === 'READY') {
-          toast({
-            title: "Sipariş Hazır!",
-            description: `Masa ${orderData.tableCode} siparişi servise hazır`,
-          });
-        }
-        loadOrders();
-      });
+    newSocket.on('connect_error', (error) => {
+      console.error('❌ Waiter WebSocket bağlantı hatası:', error);
+    });
 
-      newSocket.on('order.created', () => {
-        loadOrders();
-      });
+    newSocket.on('disconnect', (reason) => {
+      console.log('🔌 Waiter WebSocket bağlantısı kesildi:', reason);
+    });
 
-    } catch (error) {
-      console.log('WebSocket initialization failed:', error);
-    }
-
-    return () => {
-      if (socket) {
-        socket.disconnect();
+    // Listen for order updates
+    newSocket.on('order.updated', (orderData) => {
+      console.log('🔄 Waiter: Sipariş güncellendi:', orderData);
+      if (orderData.status === 'READY') {
+        toast({
+          title: "Sipariş Hazır!",
+          description: `Masa ${orderData.tableCode} siparişi servise hazır`,
+        });
       }
+      loadOrders();
+    });
+
+    newSocket.on('order.created', (orderData) => {
+      console.log('🆕 Waiter: Yeni sipariş:', orderData);
+      loadOrders();
+    });
+
+    // Cleanup function
+    return () => {
+      console.log('🧹 Waiter WebSocket temizleniyor...');
+      newSocket.removeAllListeners();
+      newSocket.disconnect();
     };
-  }, [restaurantId, toast]);
+  }, [restaurantId]); // SADECE restaurantId değiştiğinde yeniden bağlan
 
   useEffect(() => {
     loadOrders();

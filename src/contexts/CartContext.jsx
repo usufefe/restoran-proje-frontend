@@ -75,7 +75,7 @@ export const CartProvider = ({ children }) => {
     setItems(prevItems => {
       const updatedItems = prevItems.map(item =>
         item.menuItemId === menuItemId && item.notes === notes
-          ? { ...item, qty: newQuantity }
+          ? { ...item, qty: newQuantity, _updated: Date.now() } // Force update trigger
           : item
       );
       console.log('🛒 Updated cart items:', updatedItems);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,15 +14,40 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
   const { toast } = useToast();
 
   useEffect(() => {
+    if (!tableId || !restaurantId || !tenantId) return;
+    
+    console.log('🔌 Customer WebSocket bağlantısı kuruluyor...');
+    
     // Initialize WebSocket connection
-    const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001');
+    const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001', {
+      transports: ['websocket', 'polling'],
+      timeout: 5000,
+      forceNew: true,
+      reconnection: true,
+      reconnectionAttempts: 3,
+      reconnectionDelay: 2000
+    });
+    
     setSocket(newSocket);
 
-    // Join table room for real-time updates
-    newSocket.emit('join-table', { tenantId, restaurantId, tableId });
+    // Connection handlers
+    newSocket.on('connect', () => {
+      console.log('✅ Customer WebSocket bağlandı:', newSocket.id);
+      // Join table room after connection
+      newSocket.emit('join-table', { tenantId, restaurantId, tableId });
+    });
+
+    newSocket.on('connect_error', (error) => {
+      console.error('❌ Customer WebSocket bağlantı hatası:', error);
+    });
+
+    newSocket.on('disconnect', (reason) => {
+      console.log('🔌 Customer WebSocket bağlantısı kesildi:', reason);
+    });
 
     // Listen for order updates
     newSocket.on('order.updated', (orderData) => {
+      console.log('🔄 Customer: Sipariş güncellendi:', orderData);
       setOrders(prevOrders =>
         prevOrders.map(order =>
           order.id === orderData.orderId
@@ -46,10 +71,13 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
       }
     });
 
+    // Cleanup function
     return () => {
+      console.log('🧹 Customer WebSocket temizleniyor...');
+      newSocket.removeAllListeners();
       newSocket.disconnect();
     };
-  }, [tableId, tenantId, restaurantId]);
+  }, [tableId, tenantId, restaurantId]); // Bu bileşende bu parametreler değişebilir
 
   useEffect(() => {
     loadOrders();

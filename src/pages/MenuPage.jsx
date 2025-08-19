@@ -247,9 +247,6 @@ const MenuPage = () => {
                           <p className="text-lg font-bold text-orange-600">
                             {item.price.toFixed(2)} {menu.restaurant.currency}
                           </p>
-                          <p className="text-xs text-gray-500">
-                            KDV %{item.vatRate}
-                          </p>
                         </div>
                       </div>
                     </CardHeader>
@@ -356,7 +353,7 @@ const MenuPage = () => {
               <>
                 <div className="space-y-4 mb-6">
                   {cartItems.map((item, index) => (
-                    <div key={`${item.menuItemId}-${item.notes}-${index}`} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <div key={`${item.menuItemId}-${item.notes}-${item.qty}-${item._updated || index}`} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                       <div className="flex-1">
                         <h4 className="font-medium">{item.name}</h4>
                         {item.notes && (

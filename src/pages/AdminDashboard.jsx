@@ -898,25 +898,25 @@ const AdminDashboard = () => {
             </TabsContent>
 
             {/* Premium Tables Tab */}
-            <TabsContent value="tables" className="space-y-8">
-              <div className="flex justify-between items-center">
+            <TabsContent value="tables" className="space-y-6 sm:space-y-8">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
                 <div>
-                  <h2 className="text-4xl font-black bg-gradient-to-r from-orange-600 to-teal-600 bg-clip-text text-transparent">
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black bg-gradient-to-r from-orange-600 to-teal-600 bg-clip-text text-transparent">
                     Masa Yönetim Merkezi
                   </h2>
-                  <p className="text-xl text-gray-600 mt-2">QR kodları ve masa durumları</p>
+                  <p className="text-base sm:text-lg lg:text-xl text-gray-600 mt-1 sm:mt-2">QR kodları ve masa durumları</p>
                 </div>
-                <div className="flex space-x-4">
-                  <Button variant="outline" className="border-2 border-orange-200 text-orange-600 hover:bg-orange-50 px-6 py-3">
-                    <Filter className="h-5 w-5 mr-2" />
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+                  <Button variant="outline" className="border-2 border-orange-200 text-orange-600 hover:bg-orange-50 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base">
+                    <Filter className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                     Filtrele
                   </Button>
                   {user?.role === 'ADMIN' && (
                     <Button 
                       onClick={() => setIsAddTableModalOpen(true)}
-                      className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-2xl px-6 py-3"
+                      className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-2xl px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base"
                     >
-                      <Plus className="h-5 w-5 mr-2" />
+                      <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                       Yeni Masa Ekle
                     </Button>
                   )}
@@ -927,26 +927,26 @@ const AdminDashboard = () => {
                 {tables.map((table) => (
                   <Card key={table.id} className="border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 bg-white/90 backdrop-blur-xl group hover:scale-105 relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <CardHeader className="pb-4 relative">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-center space-x-4">
-                          <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-xl ${
+                    <CardHeader className="pb-3 sm:pb-4 relative">
+                      <div className="flex flex-col sm:flex-row justify-between items-start space-y-3 sm:space-y-0">
+                        <div className="flex items-center space-x-3 sm:space-x-4">
+                          <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center text-white font-black text-lg sm:text-2xl shadow-xl flex-shrink-0 ${
                             table.isActive 
                               ? 'bg-gradient-to-br from-green-500 to-emerald-600' 
                               : 'bg-gradient-to-br from-gray-400 to-gray-600'
                           }`}>
                             {table.name.split(' ')[1] || table.name.charAt(0)}
                           </div>
-                          <div>
-                            <CardTitle className="text-xl font-bold text-gray-800">{table.name}</CardTitle>
-                            <CardDescription className="font-mono text-lg font-semibold text-gray-600">
+                          <div className="min-w-0">
+                            <CardTitle className="text-lg sm:text-xl font-bold text-gray-800 truncate">{table.name}</CardTitle>
+                            <CardDescription className="font-mono text-sm sm:text-lg font-semibold text-gray-600">
                               🏷️ {table.code}
                             </CardDescription>
                           </div>
                         </div>
                         <Badge 
                           variant={table.isActive ? 'default' : 'secondary'}
-                          className={`text-sm px-3 py-1 font-bold ${
+                          className={`text-xs sm:text-sm px-2 sm:px-3 py-1 font-bold self-start ${
                             table.isActive 
                               ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg' 
                               : 'bg-gray-200 text-gray-700'
@@ -957,18 +957,18 @@ const AdminDashboard = () => {
                       </div>
                     </CardHeader>
                     <CardContent className="relative">
-                      <div className="space-y-4">
+                      <div className="space-y-3 sm:space-y-4">
                         <Button
                           variant="outline"
                           size="lg"
                           onClick={() => handleViewQR(table)}
-                          className="w-full border-2 border-orange-200 text-orange-600 hover:bg-gradient-to-r hover:from-orange-500 hover:to-teal-500 hover:text-white hover:border-transparent group-hover:border-orange-300 transition-all duration-300 py-4"
+                          className="w-full border-2 border-orange-200 text-orange-600 hover:bg-gradient-to-r hover:from-orange-500 hover:to-teal-500 hover:text-white hover:border-transparent group-hover:border-orange-300 transition-all duration-300 py-3 sm:py-4 text-sm sm:text-base"
                         >
-                          <Eye className="h-5 w-5 mr-2" />
+                          <Eye className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                           QR Kodu Görüntüle
                         </Button>
-                        <div className="pt-4 border-t border-gray-200">
-                          <div className="flex items-center justify-between text-sm">
+                        <div className="pt-3 sm:pt-4 border-t border-gray-200">
+                          <div className="flex items-center justify-between text-xs sm:text-sm">
                             <span className="text-gray-600 font-medium">Son güncelleme</span>
                             <span className="text-gray-500 bg-gray-100 px-2 py-1 rounded-full">2 saat önce</span>
                           </div>

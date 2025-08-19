@@ -3,6 +3,9 @@ import logoImage from '../assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import AddTableModal from '../components/AddTableModal';
+import AddCategoryModal from '../components/AddCategoryModal';
+import AddMenuItemModal from '../components/AddMenuItemModal';
+import EditMenuItemModal from '../components/EditMenuItemModal';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -55,6 +58,10 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAddTableModalOpen, setIsAddTableModalOpen] = useState(false);
+  const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
+  const [isAddMenuItemModalOpen, setIsAddMenuItemModalOpen] = useState(false);
+  const [isEditMenuItemModalOpen, setIsEditMenuItemModalOpen] = useState(false);
+  const [selectedMenuItem, setSelectedMenuItem] = useState(null);
   const [dashboardStats, setDashboardStats] = useState({
     todayOrders: 0,
     todayRevenue: 0,
@@ -439,6 +446,38 @@ const AdminDashboard = () => {
 
   const handleTableAdded = (newTable) => {
     setTables(prevTables => [...prevTables, newTable]);
+  };
+
+  const handleCategoryAdded = (newCategory) => {
+    setMenu(prevMenu => [...prevMenu, { ...newCategory, items: [] }]);
+  };
+
+  const handleMenuItemAdded = (newItem) => {
+    setMenu(prevMenu => 
+      prevMenu.map(category => 
+        category.id === newItem.categoryId 
+          ? { ...category, items: [...(category.items || []), newItem] }
+          : category
+      )
+    );
+  };
+
+  const handleEditMenuItem = (item) => {
+    setSelectedMenuItem(item);
+    setIsEditMenuItemModalOpen(true);
+  };
+
+  const handleMenuItemUpdated = (updatedItem) => {
+    setMenu(prevMenu => 
+      prevMenu.map(category => ({
+        ...category,
+        items: category.items?.map(item => 
+          item.id === updatedItem.id 
+            ? { ...updatedItem, categoryId: item.categoryId }
+            : item
+        ) || []
+      }))
+    );
   };
 
   if (loading || isLoading) {
@@ -954,11 +993,18 @@ const AdminDashboard = () => {
                   </Button>
                   {user?.role === 'ADMIN' && (
                     <div className="flex space-x-3">
-                      <Button variant="outline" className="border-2 border-teal-200 text-teal-600 hover:bg-teal-50 px-6 py-3">
+                      <Button 
+                        onClick={() => setIsAddCategoryModalOpen(true)}
+                        variant="outline" 
+                        className="border-2 border-teal-200 text-teal-600 hover:bg-teal-50 px-6 py-3"
+                      >
                         <Plus className="h-5 w-5 mr-2" />
                         Kategori Ekle
                       </Button>
-                      <Button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-2xl px-6 py-3">
+                      <Button 
+                        onClick={() => setIsAddMenuItemModalOpen(true)}
+                        className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-2xl px-6 py-3"
+                      >
                         <Plus className="h-5 w-5 mr-2" />
                         Ürün Ekle
                       </Button>
@@ -1007,7 +1053,11 @@ const AdminDashboard = () => {
                     <CardContent className="relative">
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {category.items?.map((item) => (
-                          <div key={item.id} className="flex justify-between items-center p-6 bg-gradient-to-r from-gray-50 via-white to-orange-50/30 rounded-2xl border-2 border-orange-100 hover:shadow-xl transition-all duration-300 group hover:scale-102">
+                          <div 
+                            key={item.id} 
+                            onClick={() => handleEditMenuItem({ ...item, categoryId: category.id })}
+                            className="flex justify-between items-center p-6 bg-gradient-to-r from-gray-50 via-white to-orange-50/30 rounded-2xl border-2 border-orange-100 hover:shadow-xl transition-all duration-300 group hover:scale-102 cursor-pointer"
+                          >
                             <div className="flex items-center space-x-6">
                               <div className="w-20 h-20 bg-gradient-to-br from-orange-400 via-teal-400 to-purple-400 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-xl">
                                 🍽️
@@ -1150,6 +1200,33 @@ const AdminDashboard = () => {
           onClose={() => setIsAddTableModalOpen(false)}
           restaurantId={selectedRestaurant?.id}
           onTableAdded={handleTableAdded}
+        />
+
+        {/* Add Category Modal */}
+        <AddCategoryModal
+          isOpen={isAddCategoryModalOpen}
+          onClose={() => setIsAddCategoryModalOpen(false)}
+          restaurantId={selectedRestaurant?.id}
+          onCategoryAdded={handleCategoryAdded}
+        />
+
+        {/* Add Menu Item Modal */}
+        <AddMenuItemModal
+          isOpen={isAddMenuItemModalOpen}
+          onClose={() => setIsAddMenuItemModalOpen(false)}
+          restaurantId={selectedRestaurant?.id}
+          categories={menu}
+          onMenuItemAdded={handleMenuItemAdded}
+        />
+
+        {/* Edit Menu Item Modal */}
+        <EditMenuItemModal
+          isOpen={isEditMenuItemModalOpen}
+          onClose={() => setIsEditMenuItemModalOpen(false)}
+          restaurantId={selectedRestaurant?.id}
+          categories={menu}
+          menuItem={selectedMenuItem}
+          onMenuItemUpdated={handleMenuItemUpdated}
         />
       </main>
     </div>

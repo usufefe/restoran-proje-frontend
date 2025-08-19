@@ -95,6 +95,7 @@ export const adminAPI = {
   getMenu: (restaurantId) => api.get(`/admin/restaurants/${restaurantId}/menu`),
   createCategory: (restaurantId, categoryData) => api.post(`/admin/restaurants/${restaurantId}/categories`, categoryData),
   createMenuItem: (restaurantId, itemData) => api.post(`/admin/restaurants/${restaurantId}/items`, itemData),
+  updateMenuItem: (restaurantId, itemId, itemData) => api.put(`/admin/restaurants/${restaurantId}/items/${itemId}`, itemData),
   getUsers: () => api.get('/admin/users'),
   updateUserStatus: (userId, isActive) => api.patch(`/admin/users/${userId}/status`, { isActive }),
 };

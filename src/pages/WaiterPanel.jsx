@@ -18,6 +18,33 @@ const WaiterPanel = () => {
   const [socket, setSocket] = useState(null);
   const [activeTab, setActiveTab] = useState('ready');
 
+  // WebSocket için ayrı useEffect - loadOrders'dan sonra çalışsın
+  useEffect(() => {
+    if (!restaurantId || !socket) return;
+    
+    // Listen for order updates
+    socket.on('order.updated', (orderData) => {
+      console.log('🔄 Waiter: Sipariş güncellendi:', orderData);
+      if (orderData.status === 'READY') {
+        toast({
+          title: "Sipariş Hazır!",
+          description: `Masa ${orderData.tableCode} siparişi servise hazır`,
+        });
+      }
+      loadOrders();
+    });
+
+    socket.on('order.created', (orderData) => {
+      console.log('🆕 Waiter: Yeni sipariş:', orderData);
+      loadOrders();
+    });
+
+    return () => {
+      socket.off('order.updated');
+      socket.off('order.created');
+    };
+  }, [socket, loadOrders, restaurantId, toast]);
+
   useEffect(() => {
     if (!restaurantId) return;
     
@@ -48,23 +75,6 @@ const WaiterPanel = () => {
 
     newSocket.on('disconnect', (reason) => {
       console.log('🔌 Waiter WebSocket bağlantısı kesildi:', reason);
-    });
-
-    // Listen for order updates
-    newSocket.on('order.updated', (orderData) => {
-      console.log('🔄 Waiter: Sipariş güncellendi:', orderData);
-      if (orderData.status === 'READY') {
-        toast({
-          title: "Sipariş Hazır!",
-          description: `Masa ${orderData.tableCode} siparişi servise hazır`,
-        });
-      }
-      loadOrders();
-    });
-
-    newSocket.on('order.created', (orderData) => {
-      console.log('🆕 Waiter: Yeni sipariş:', orderData);
-      loadOrders();
     });
 
     // Cleanup function

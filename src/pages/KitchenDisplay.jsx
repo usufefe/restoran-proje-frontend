@@ -16,6 +16,38 @@ const KitchenDisplay = () => {
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState(null);
 
+  // WebSocket için ayrı useEffect - loadOrders'dan sonra çalışsın
+  useEffect(() => {
+    if (!restaurantId || !socket) return;
+    
+    // Listen for new orders
+    socket.on('order.created', (orderData) => {
+      console.log('🆕 Yeni sipariş geldi:', orderData);
+      toast({
+        title: "Yeni Sipariş!",
+        description: `Masa ${orderData.tableCode} - ${orderData.itemCount} ürün`,
+      });
+      loadOrders();
+    });
+
+    // Listen for order updates
+    socket.on('order.updated', (orderData) => {
+      console.log('🔄 Sipariş güncellendi:', orderData);
+      setOrders(prevOrders =>
+        prevOrders.map(order =>
+          order.id === orderData.orderId
+            ? { ...order, status: orderData.status }
+            : order
+        )
+      );
+    });
+
+    return () => {
+      socket.off('order.created');
+      socket.off('order.updated');
+    };
+  }, [socket, loadOrders, restaurantId, toast]);
+
   useEffect(() => {
     if (!restaurantId) return;
     
@@ -46,28 +78,6 @@ const KitchenDisplay = () => {
 
     newSocket.on('disconnect', (reason) => {
       console.log('🔌 WebSocket bağlantısı kesildi:', reason);
-    });
-
-    // Listen for new orders
-    newSocket.on('order.created', (orderData) => {
-      console.log('🆕 Yeni sipariş geldi:', orderData);
-      toast({
-        title: "Yeni Sipariş!",
-        description: `Masa ${orderData.tableCode} - ${orderData.itemCount} ürün`,
-      });
-      loadOrders();
-    });
-
-    // Listen for order updates
-    newSocket.on('order.updated', (orderData) => {
-      console.log('🔄 Sipariş güncellendi:', orderData);
-      setOrders(prevOrders =>
-        prevOrders.map(order =>
-          order.id === orderData.orderId
-            ? { ...order, status: orderData.status }
-            : order
-        )
-      );
     });
 
     // Cleanup function

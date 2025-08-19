@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import logoImage from '../assets/logo.png';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -165,7 +166,7 @@ const MenuPage = () => {
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <img src="/logo.png" alt="QR Menü" className="h-8 w-8 mr-3" />
+              <img src={logoImage} alt="QR Menü" className="h-8 w-8 mr-3" />
               <div>
                 <h1 className="text-xl font-bold text-gray-900">{menu.restaurant.name}</h1>
                 {session && (

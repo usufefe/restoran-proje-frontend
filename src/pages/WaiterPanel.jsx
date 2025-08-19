@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import logoImage from '../assets/logo.png';
 import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -198,7 +199,7 @@ const WaiterPanel = () => {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <img src="/logo.png" alt="Logo" className="h-8 w-8 mr-3 rounded-lg" />
+              <img src={logoImage} alt="Logo" className="h-8 w-8 mr-3 rounded-lg" />
               <Users className="h-6 w-6 text-blue-600 mr-2" />
               <h1 className="text-2xl font-bold text-gray-900">Garson Paneli</h1>
             </div>

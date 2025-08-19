@@ -1120,10 +1120,10 @@ const EnhancedEditMenuItemModal = ({ isOpen, onClose, restaurantId, categories, 
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-[98vw] w-[98vw] h-[95vh] overflow-hidden flex flex-col p-0">
+      <DialogContent className="max-w-[95vw] w-[95vw] md:max-w-[98vw] md:w-[98vw] h-[90vh] md:h-[95vh] overflow-hidden flex flex-col p-0">
         {step === 1 ? (
           <>
-            <DialogHeader className="flex-shrink-0 px-4 lg:px-8 py-4 border-b">
+            <DialogHeader className="flex-shrink-0 px-3 sm:px-4 lg:px-8 py-3 sm:py-4 border-b">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <div className="relative group">
@@ -1149,8 +1149,8 @@ const EnhancedEditMenuItemModal = ({ isOpen, onClose, restaurantId, categories, 
               </div>
             </DialogHeader>
 
-            <div className="flex-1 overflow-y-auto px-4 lg:px-8">
-              <form onSubmit={handleSubmit} className="space-y-6 py-6">
+            <div className="flex-1 overflow-y-auto px-3 sm:px-4 lg:px-8">
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 py-4 sm:py-6">
                 {currentStep === 1 && renderStep1()}
                 {currentStep === 2 && renderStep2()}
                 {currentStep === 3 && renderStep3()}
@@ -1158,7 +1158,7 @@ const EnhancedEditMenuItemModal = ({ isOpen, onClose, restaurantId, categories, 
               </form>
             </div>
 
-            <DialogFooter className="flex-shrink-0 flex justify-between pt-6 pb-4 border-t px-4 lg:px-8">
+            <DialogFooter className="flex-shrink-0 flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 pt-4 sm:pt-6 pb-3 sm:pb-4 border-t px-3 sm:px-4 lg:px-8">
               <div className="flex space-x-2">
                 <Button 
                   type="button" 
@@ -1218,7 +1218,7 @@ const EnhancedEditMenuItemModal = ({ isOpen, onClose, restaurantId, categories, 
           </>
         ) : (
           <>
-            <DialogHeader className="px-4 lg:px-8 py-4 border-b">
+            <DialogHeader className="px-3 sm:px-4 lg:px-8 py-3 sm:py-4 border-b">
               <div className="text-center">
                 <div className="mx-auto w-20 h-20 bg-gradient-to-br from-emerald-500 via-teal-500 to-blue-500 rounded-full flex items-center justify-center mb-6 relative">
                   <Check className="h-10 w-10 text-white" />
@@ -1233,7 +1233,7 @@ const EnhancedEditMenuItemModal = ({ isOpen, onClose, restaurantId, categories, 
               </div>
             </DialogHeader>
 
-            <div className="mt-6 space-y-6 overflow-y-auto px-4 lg:px-8">
+            <div className="mt-6 space-y-6 overflow-y-auto px-3 sm:px-4 lg:px-8">
               <Card className="border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl">
                 <CardContent className="p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1306,7 +1306,7 @@ const EnhancedEditMenuItemModal = ({ isOpen, onClose, restaurantId, categories, 
               </div>
             </div>
 
-            <DialogFooter className="pt-6 pb-4 px-4 lg:px-8 border-t">
+            <DialogFooter className="pt-4 sm:pt-6 pb-3 sm:pb-4 px-3 sm:px-4 lg:px-8 border-t">
               <Button 
                 onClick={handleClose}
                 className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-3 rounded-2xl text-lg font-semibold"

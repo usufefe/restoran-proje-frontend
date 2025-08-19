@@ -78,10 +78,6 @@ const KitchenDisplay = () => {
     };
   }, [restaurantId]); // SADECE restaurantId değiştiğinde yeniden bağlan
 
-  useEffect(() => {
-    loadOrders();
-  }, [loadOrders]);
-
   const loadOrders = useCallback(async () => {
     try {
       const response = await ordersAPI.getRestaurantOrders(restaurantId, {
@@ -100,6 +96,10 @@ const KitchenDisplay = () => {
       setLoading(false);
     }
   }, [restaurantId, toast]);
+
+  useEffect(() => {
+    loadOrders();
+  }, [loadOrders]);
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {

@@ -77,9 +77,9 @@ const WaiterPanel = () => {
 
   useEffect(() => {
     loadOrders();
-  }, [restaurantId]);
+  }, [loadOrders]);
 
-  const loadOrders = async () => {
+  const loadOrders = useCallback(async () => {
     try {
       const response = await ordersAPI.getRestaurantOrders(restaurantId, {
         limit: 50
@@ -95,7 +95,7 @@ const WaiterPanel = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [restaurantId, toast]);
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {

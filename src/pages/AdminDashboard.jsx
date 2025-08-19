@@ -601,38 +601,42 @@ const AdminDashboard = () => {
 
         {selectedRestaurant && (
           <Tabs defaultValue="overview" className="w-full">
-            {/* Premium Tab Navigation */}
-            <TabsList className="grid w-full grid-cols-4 bg-white/60 backdrop-blur-xl border-2 border-white/20 rounded-2xl p-2 mb-10 shadow-2xl">
-              <TabsTrigger 
-                value="overview" 
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-xl rounded-xl font-semibold transition-all duration-300 py-4"
-              >
-                <BarChart3 className="h-5 w-5 mr-2" />
-                Genel Bakış
-              </TabsTrigger>
-              <TabsTrigger 
-                value="tables"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-xl rounded-xl font-semibold transition-all duration-300 py-4"
-              >
-                <QrCode className="h-5 w-5 mr-2" />
-                Masa Yönetimi
-              </TabsTrigger>
-              <TabsTrigger 
-                value="menu"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-xl rounded-xl font-semibold transition-all duration-300 py-4"
-              >
-                <ChefHat className="h-5 w-5 mr-2" />
-                Menü Sistemi
-              </TabsTrigger>
-              {user?.role === 'ADMIN' && (
-                <TabsTrigger 
-                  value="users"
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-xl rounded-xl font-semibold transition-all duration-300 py-4"
-                >
-                  <Users className="h-5 w-5 mr-2" />
-                  Kullanıcı Yönetimi
-                </TabsTrigger>
-              )}
+                         {/* Responsive Tab Navigation */}
+             <TabsList className="grid w-full grid-cols-4 bg-white/60 backdrop-blur-xl border-2 border-white/20 rounded-2xl p-2 mb-10 shadow-2xl">
+               <TabsTrigger 
+                 value="overview" 
+                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-xl rounded-xl font-semibold transition-all duration-300 py-3 px-2 text-sm"
+               >
+                 <BarChart3 className="h-4 w-4 sm:mr-2" />
+                 <span className="hidden sm:inline">Genel Bakış</span>
+                 <span className="sm:hidden">Genel</span>
+               </TabsTrigger>
+               <TabsTrigger 
+                 value="tables"
+                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-xl rounded-xl font-semibold transition-all duration-300 py-3 px-2 text-sm"
+               >
+                 <QrCode className="h-4 w-4 sm:mr-2" />
+                 <span className="hidden sm:inline">Masalar</span>
+                 <span className="sm:hidden">Masa</span>
+               </TabsTrigger>
+               <TabsTrigger 
+                 value="menu"
+                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-xl rounded-xl font-semibold transition-all duration-300 py-3 px-2 text-sm"
+               >
+                 <ChefHat className="h-4 w-4 sm:mr-2" />
+                 <span className="hidden sm:inline">Menü</span>
+                 <span className="sm:hidden">Menü</span>
+               </TabsTrigger>
+               {user?.role === 'ADMIN' && (
+                 <TabsTrigger 
+                   value="users"
+                   className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-xl rounded-xl font-semibold transition-all duration-300 py-3 px-2 text-sm"
+                 >
+                   <Users className="h-4 w-4 sm:mr-2" />
+                   <span className="hidden sm:inline">Kullanıcılar</span>
+                   <span className="sm:hidden">User</span>
+                 </TabsTrigger>
+               )}
             </TabsList>
 
             {/* Premium Overview Tab */}

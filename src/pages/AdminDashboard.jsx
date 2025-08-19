@@ -981,34 +981,34 @@ const AdminDashboard = () => {
             </TabsContent>
 
             {/* Premium Menu Tab */}
-            <TabsContent value="menu" className="space-y-8">
-              <div className="flex justify-between items-center">
+            <TabsContent value="menu" className="space-y-6 sm:space-y-8">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
                 <div>
-                  <h2 className="text-4xl font-black bg-gradient-to-r from-orange-600 to-teal-600 bg-clip-text text-transparent">
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black bg-gradient-to-r from-orange-600 to-teal-600 bg-clip-text text-transparent">
                     Menü Yönetim Sistemi
                   </h2>
-                  <p className="text-xl text-gray-600 mt-2">Kategoriler ve ürün yönetimi</p>
+                  <p className="text-base sm:text-lg lg:text-xl text-gray-600 mt-1 sm:mt-2">Kategoriler ve ürün yönetimi</p>
                 </div>
-                <div className="flex space-x-4">
-                  <Button variant="outline" className="border-2 border-orange-200 text-orange-600 hover:bg-orange-50 px-6 py-3">
-                    <Download className="h-5 w-5 mr-2" />
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+                  <Button variant="outline" className="border-2 border-orange-200 text-orange-600 hover:bg-orange-50 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base">
+                    <Download className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                     Dışa Aktar
                   </Button>
                   {user?.role === 'ADMIN' && (
-                    <div className="flex space-x-3">
+                    <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
                       <Button 
                         onClick={() => setIsAddCategoryModalOpen(true)}
                         variant="outline" 
-                        className="border-2 border-teal-200 text-teal-600 hover:bg-teal-50 px-6 py-3"
+                        className="border-2 border-teal-200 text-teal-600 hover:bg-teal-50 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base"
                       >
-                        <Plus className="h-5 w-5 mr-2" />
+                        <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                         Kategori Ekle
                       </Button>
                       <Button 
                         onClick={() => setIsAddMenuItemModalOpen(true)}
-                        className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-2xl px-6 py-3"
+                        className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-2xl px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base"
                       >
-                        <Plus className="h-5 w-5 mr-2" />
+                        <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                         Ürün Ekle
                       </Button>
                     </div>
@@ -1016,30 +1016,30 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="space-y-8">
+              <div className="space-y-6 sm:space-y-8">
                 {menu.map((category) => (
                   <Card key={category.id} className="border-0 shadow-2xl bg-white/90 backdrop-blur-xl relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-teal-500/5"></div>
                     <CardHeader className="relative">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center space-x-6">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+                        <div className="flex items-center space-x-4 sm:space-x-6">
                           <div className="relative group">
                             <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-teal-500 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-300"></div>
-                            <div className="relative w-16 h-16 bg-gradient-to-br from-orange-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-xl">
-                              <ChefHat className="h-8 w-8 text-white" />
+                            <div className="relative w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-xl">
+                              <ChefHat className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                             </div>
                           </div>
-                          <div>
-                            <CardTitle className="text-2xl font-bold text-gray-800">{category.name}</CardTitle>
-                            <CardDescription className="text-lg text-gray-600">
+                          <div className="min-w-0">
+                            <CardTitle className="text-xl sm:text-2xl font-bold text-gray-800 truncate">{category.name}</CardTitle>
+                            <CardDescription className="text-sm sm:text-lg text-gray-600">
                               📋 {category.items?.length || 0} ürün mevcut
                             </CardDescription>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-3 sm:space-x-4 self-start sm:self-auto">
                           <Badge 
                             variant={category.isActive ? 'default' : 'secondary'}
-                            className={`text-sm px-4 py-2 font-bold ${
+                            className={`text-xs sm:text-sm px-3 sm:px-4 py-1 sm:py-2 font-bold ${
                               category.isActive 
                                 ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg' 
                                 : 'bg-gray-200 text-gray-700'
@@ -1047,8 +1047,8 @@ const AdminDashboard = () => {
                           >
                             {category.isActive ? '✅ Aktif' : '❌ Pasif'}
                           </Badge>
-                          <Button variant="ghost" size="lg" className="text-gray-600 hover:text-orange-600">
-                            <Settings className="h-5 w-5" />
+                          <Button variant="ghost" size="sm" className="text-gray-600 hover:text-orange-600 p-2">
+                            <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
                           </Button>
                         </div>
                       </div>

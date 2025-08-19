@@ -312,7 +312,7 @@ const AdminDashboard = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center space-x-4">
-              <img src="/pardonbakarmisin-logo.png" alt="Logo" className="w-12 h-12 rounded-xl shadow-lg" />
+              <img src="/logo.png" alt="Logo" className="w-12 h-12 rounded-xl shadow-lg" />
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-teal-600 bg-clip-text text-transparent">
                   Gastro Admin

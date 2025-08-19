@@ -528,28 +528,28 @@ const AdminDashboard = () => {
 
       {/* Premium Header */}
       <header className="sticky top-0 z-40 bg-white/80 supports-[backdrop-filter]:bg-white/60 backdrop-blur shadow-[0_10px_30px_-15px_rgba(0,0,0,0.25)] relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="flex justify-between items-center h-24">
-            <div className="flex items-center space-x-6">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative">
+          <div className="flex justify-between items-center h-16 sm:h-20 md:h-24">
+            <div className="flex items-center space-x-3 sm:space-x-4 lg:space-x-6">
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-teal-500 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
                 <img 
                   src={logoImage} 
                   alt="Logo" 
-                  className="relative w-16 h-16 rounded-xl shadow-xl ring-2 ring-white/50" 
+                  className="relative w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl shadow-xl ring-2 ring-white/50" 
                 />
               </div>
-              <div>
-                <h1 className="text-3xl font-black bg-gradient-to-r from-orange-600 via-teal-600 to-purple-600 bg-clip-text text-transparent">
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-black bg-gradient-to-r from-orange-600 via-teal-600 to-purple-600 bg-clip-text text-transparent truncate">
                   Gastro Admin
                 </h1>
-                <p className="text-sm text-gray-600 font-medium">Premium Restoran Yönetim Sistemi</p>
+                <p className="text-xs sm:text-sm text-gray-600 font-medium hidden sm:block">Premium Restoran Yönetim Sistemi</p>
               </div>
             </div>
             
-            <div className="flex items-center space-x-8">
-              {/* Enhanced Notification Area */}
-              <div className="hidden lg:flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4 lg:space-x-8">
+              {/* Enhanced Notification Area - Mobile Hidden */}
+              <div className="hidden xl:flex items-center space-x-4">
                 <Button variant="ghost" size="sm" className="relative group">
                   <Bell className="h-5 w-5 text-gray-600 group-hover:text-orange-500 transition-colors" />
                   <span className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-red-500 to-pink-500 rounded-full text-xs flex items-center justify-center text-white font-bold animate-pulse">3</span>
@@ -562,21 +562,21 @@ const AdminDashboard = () => {
                 </Button>
               </div>
               
-              {/* Premium User Section */}
-              <div className="flex items-center space-x-4 pl-6 border-l border-gray-200/50">
-                <div className="text-right hidden sm:block">
+              {/* Premium User Section - Mobile Optimized */}
+              <div className="flex items-center space-x-2 sm:space-x-3 lg:space-x-4 pl-2 sm:pl-4 lg:pl-6 border-l border-gray-200/50">
+                <div className="text-right hidden md:block">
                   <p className="text-sm font-semibold text-gray-800">Hoş geldin,</p>
-                  <p className="text-xs text-gray-500 font-medium">{user?.name}</p>
+                  <p className="text-xs text-gray-500 font-medium truncate max-w-[100px]">{user?.name}</p>
                 </div>
                 <div className="relative group">
                   <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-teal-500 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-300"></div>
-                  <div className="relative w-12 h-12 bg-gradient-to-br from-orange-400 via-teal-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-xl">
+                  <div className="relative w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-orange-400 via-teal-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-lg shadow-xl">
                     {user?.name?.charAt(0)?.toUpperCase()}
                   </div>
                 </div>
                 <Badge 
                   variant={user?.role === 'ADMIN' ? 'default' : 'secondary'}
-                  className="bg-gradient-to-r from-orange-500 via-teal-500 to-purple-500 text-white border-0 px-3 py-1 font-semibold shadow-lg"
+                  className="bg-gradient-to-r from-orange-500 via-teal-500 to-purple-500 text-white border-0 px-2 sm:px-3 py-1 font-semibold shadow-lg text-xs sm:text-sm hidden sm:flex"
                 >
                   <Shield className="h-3 w-3 mr-1" />
                   {user?.role}
@@ -584,10 +584,10 @@ const AdminDashboard = () => {
                 <Button 
                   variant="outline" 
                   onClick={handleLogout}
-                  className="border-2 border-orange-200 text-orange-600 hover:bg-gradient-to-r hover:from-orange-500 hover:to-teal-500 hover:text-white hover:border-transparent transition-all duration-300 shadow-lg"
+                  className="border-2 border-orange-200 text-orange-600 hover:bg-gradient-to-r hover:from-orange-500 hover:to-teal-500 hover:text-white hover:border-transparent transition-all duration-300 shadow-lg text-xs sm:text-sm px-2 sm:px-4"
                 >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Çıkış Yap
+                  <LogOut className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Çıkış Yap</span>
                 </Button>
               </div>
             </div>
@@ -595,22 +595,22 @@ const AdminDashboard = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-24 sm:pt-28 pb-10">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10 pt-20 sm:pt-24 md:pt-28 pb-6 sm:pb-10">
         {/* Premium Restaurant Selector */}
         {restaurants.length > 1 && (
-          <Card className="mb-10 border-0 shadow-2xl bg-gradient-to-r from-white via-orange-50/30 to-teal-50/30 backdrop-blur-xl relative overflow-hidden">
+          <Card className="mb-6 sm:mb-8 lg:mb-10 border-0 shadow-2xl bg-gradient-to-r from-white via-orange-50/30 to-teal-50/30 backdrop-blur-xl relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-teal-500/5"></div>
-            <CardContent className="p-8 relative">
-              <div className="flex items-center space-x-6">
-                <div className="relative group">
+            <CardContent className="p-4 sm:p-6 lg:p-8 relative">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 lg:space-x-6">
+                <div className="relative group flex-shrink-0">
                   <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-teal-500 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-300"></div>
-                  <div className="relative w-16 h-16 bg-gradient-to-br from-orange-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-xl">
-                    <MapPin className="h-8 w-8 text-white" />
+                  <div className="relative w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-orange-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-xl">
+                    <MapPin className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-white" />
                   </div>
                 </div>
-                <div className="flex-1">
-                  <label className="block text-lg font-bold text-gray-800 mb-3 flex items-center">
-                    <Globe className="h-5 w-5 mr-2 text-orange-500" />
+                <div className="flex-1 min-w-0">
+                  <label className="block text-base sm:text-lg font-bold text-gray-800 mb-2 sm:mb-3 flex items-center">
+                    <Globe className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-orange-500" />
                     Aktif Restoran Lokasyonu
                   </label>
                   <select
@@ -619,7 +619,7 @@ const AdminDashboard = () => {
                       const restaurant = restaurants.find(r => r.id === e.target.value);
                       handleRestaurantChange(restaurant);
                     }}
-                    className="block w-full max-w-lg px-6 py-4 bg-white/80 backdrop-blur-sm border-2 border-orange-200 rounded-2xl shadow-lg focus:outline-none focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-300 text-lg font-medium"
+                    className="block w-full px-4 sm:px-6 py-3 sm:py-4 bg-white/80 backdrop-blur-sm border-2 border-orange-200 rounded-2xl shadow-lg focus:outline-none focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-300 text-sm sm:text-base lg:text-lg font-medium"
                   >
                     {restaurants.map((restaurant) => (
                       <option key={restaurant.id} value={restaurant.id}>
@@ -628,7 +628,7 @@ const AdminDashboard = () => {
                     ))}
                   </select>
                 </div>
-                <div className="hidden md:flex items-center space-x-4 text-sm text-gray-600">
+                <div className="hidden lg:flex items-center space-x-4 text-sm text-gray-600 flex-shrink-0">
                   <div className="flex items-center space-x-2">
                     <Wifi className="h-4 w-4 text-green-500" />
                     <span>Çevrimiçi</span>
@@ -645,44 +645,47 @@ const AdminDashboard = () => {
 
         {selectedRestaurant && (
           <Tabs defaultValue="overview" className="w-full">
-            {/* Premium Tab Navigation */}
-            <TabsList className="grid w-full grid-cols-4 bg-transparent border-0 rounded-none p-0 mb-10 gap-2 relative z-[11]">
+            {/* Premium Tab Navigation - Mobile Responsive */}
+            <TabsList className="grid w-full grid-cols-4 bg-transparent border-0 rounded-none p-0 mb-8 sm:mb-10 lg:mb-12 gap-1 sm:gap-2 relative z-[11]">
               <TabsTrigger 
                 value="overview" 
-                className="bg-white/70 hover:bg-white/90 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white text-gray-700 hover:text-gray-900 data-[state=active]:shadow-2xl shadow-lg rounded-2xl font-semibold transition-all duration-300 py-4 px-4 backdrop-blur-sm border border-white/30 data-[state=active]:border-transparent"
+                className="bg-white/70 hover:bg-white/90 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white text-gray-700 hover:text-gray-900 data-[state=active]:shadow-2xl shadow-lg rounded-xl sm:rounded-2xl font-semibold transition-all duration-300 py-2 sm:py-3 lg:py-4 px-1 sm:px-2 lg:px-4 backdrop-blur-sm border border-white/30 data-[state=active]:border-transparent text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2"
               >
-                <BarChart3 className="h-5 w-5 mr-2" />
-                Genel Bakış
+                <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">Genel Bakış</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="tables"
-                className="bg-white/70 hover:bg-white/90 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white text-gray-700 hover:text-gray-900 data-[state=active]:shadow-2xl shadow-lg rounded-2xl font-semibold transition-all duration-300 py-4 px-4 backdrop-blur-sm border border-white/30 data-[state=active]:border-transparent"
+                className="bg-white/70 hover:bg-white/90 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white text-gray-700 hover:text-gray-900 data-[state=active]:shadow-2xl shadow-lg rounded-2xl font-semibold transition-all duration-300 py-3 sm:py-4 px-2 sm:px-4 backdrop-blur-sm border border-white/30 data-[state=active]:border-transparent text-xs sm:text-sm"
               >
-                <QrCode className="h-5 w-5 mr-2" />
-                Masa Yönetimi
+                <QrCode className="h-4 w-4 sm:h-5 sm:w-5 sm:mr-2" />
+                <span className="hidden sm:inline">Masa Yönetimi</span>
+                <span className="sm:hidden">Masa</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="menu"
-                className="bg-white/70 hover:bg-white/90 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white text-gray-700 hover:text-gray-900 data-[state=active]:shadow-2xl shadow-lg rounded-2xl font-semibold transition-all duration-300 py-4 px-4 backdrop-blur-sm border border-white/30 data-[state=active]:border-transparent"
+                className="bg-white/70 hover:bg-white/90 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white text-gray-700 hover:text-gray-900 data-[state=active]:shadow-2xl shadow-lg rounded-2xl font-semibold transition-all duration-300 py-3 sm:py-4 px-2 sm:px-4 backdrop-blur-sm border border-white/30 data-[state=active]:border-transparent text-xs sm:text-sm"
               >
-                <ChefHat className="h-5 w-5 mr-2" />
-                Menü Sistemi
+                <ChefHat className="h-4 w-4 sm:h-5 sm:w-5 sm:mr-2" />
+                <span className="hidden sm:inline">Menü Sistemi</span>
+                <span className="sm:hidden">Menü</span>
               </TabsTrigger>
               {user?.role === 'ADMIN' && (
                 <TabsTrigger 
                   value="users"
-                  className="bg-white/70 hover:bg-white/90 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white text-gray-700 hover:text-gray-900 data-[state=active]:shadow-2xl shadow-lg rounded-2xl font-semibold transition-all duration-300 py-4 px-4 backdrop-blur-sm border border-white/30 data-[state=active]:border-transparent"
+                  className="bg-white/70 hover:bg-white/90 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-teal-500 data-[state=active]:text-white text-gray-700 hover:text-gray-900 data-[state=active]:shadow-2xl shadow-lg rounded-2xl font-semibold transition-all duration-300 py-3 sm:py-4 px-2 sm:px-4 backdrop-blur-sm border border-white/30 data-[state=active]:border-transparent text-xs sm:text-sm"
                 >
-                  <Users className="h-5 w-5 mr-2" />
-                  Kullanıcı Yönetimi
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 sm:mr-2" />
+                  <span className="hidden sm:inline">Kullanıcı Yönetimi</span>
+                  <span className="sm:hidden">Kullanıcı</span>
                 </TabsTrigger>
               )}
             </TabsList>
 
             {/* Premium Overview Tab */}
-            <TabsContent value="overview" className="space-y-10">
+            <TabsContent value="overview" className="space-y-6 sm:space-y-8 lg:space-y-10">
               {/* Enhanced Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
                 <Card className="border-0 shadow-2xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 text-white overflow-hidden relative group hover:scale-105 transition-all duration-300">
                   <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
@@ -792,7 +795,7 @@ const AdminDashboard = () => {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-8 relative">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                     <Button
                       onClick={() => navigate(`/kitchen/${selectedRestaurant.id}`)}
                       className="h-24 bg-gradient-to-br from-red-500 via-red-600 to-pink-600 hover:from-red-600 hover:via-red-700 hover:to-pink-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 flex-col space-y-3 group relative overflow-hidden"
@@ -920,7 +923,7 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
                 {tables.map((table) => (
                   <Card key={table.id} className="border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 bg-white/90 backdrop-blur-xl group hover:scale-105 relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -1051,28 +1054,28 @@ const AdminDashboard = () => {
                       </div>
                     </CardHeader>
                     <CardContent className="relative">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                         {category.items?.map((item) => (
                           <div 
                             key={item.id} 
                             onClick={() => handleEditMenuItem({ ...item, categoryId: category.id })}
-                            className="flex justify-between items-center p-6 bg-gradient-to-r from-gray-50 via-white to-orange-50/30 rounded-2xl border-2 border-orange-100 hover:shadow-xl transition-all duration-300 group hover:scale-102 cursor-pointer"
+                            className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 sm:p-6 bg-gradient-to-r from-gray-50 via-white to-orange-50/30 rounded-2xl border-2 border-orange-100 hover:shadow-xl transition-all duration-300 group hover:scale-102 cursor-pointer space-y-3 sm:space-y-0"
                           >
-                            <div className="flex items-center space-x-6">
-                              <div className="w-20 h-20 bg-gradient-to-br from-orange-400 via-teal-400 to-purple-400 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-xl">
+                            <div className="flex items-center space-x-4 sm:space-x-6">
+                              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-orange-400 via-teal-400 to-purple-400 rounded-2xl flex items-center justify-center text-white font-bold text-xl sm:text-2xl shadow-xl flex-shrink-0">
                                 🍽️
                               </div>
-                              <div>
-                                <h4 className="text-lg font-bold text-gray-900 group-hover:text-orange-600 transition-colors duration-200">
+                              <div className="min-w-0">
+                                <h4 className="text-base sm:text-lg font-bold text-gray-900 group-hover:text-orange-600 transition-colors duration-200 truncate">
                                   {item.name}
                                 </h4>
-                                <p className="text-sm text-gray-600 mt-2 line-clamp-2 leading-relaxed">
+                                <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2 line-clamp-2 leading-relaxed">
                                   {item.description}
                                 </p>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <p className="text-2xl font-black text-orange-600 mb-3">
+                            <div className="text-right sm:text-right self-end sm:self-auto">
+                              <p className="text-xl sm:text-2xl font-black text-orange-600 mb-2 sm:mb-3">
                                 ₺{item.price.toFixed(2)}
                               </p>
                               <Badge 

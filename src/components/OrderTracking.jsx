@@ -72,12 +72,32 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
     }
   };
 
+  const handleCancelOrder = async (orderId) => {
+    try {
+      await ordersAPI.updateOrderStatus(orderId, 'CANCELLED');
+      toast({
+        title: "Sipariş İptal Edildi",
+        description: "Siparişiniz başarıyla iptal edildi.",
+        variant: "success",
+      });
+      loadOrders(); // Refresh orders
+    } catch (error) {
+      console.error('Failed to cancel order:', error);
+      toast({
+        title: "Hata",
+        description: "Sipariş iptal edilirken bir hata oluştu.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getStatusText = (status) => {
     const statusMap = {
       'PENDING': 'Sipariş Alındı',
       'IN_PROGRESS': 'Hazırlanıyor',
       'READY': 'Servise Hazır',
-      'SERVED': 'Servis Edildi'
+      'SERVED': 'Servis Edildi',
+      'CANCELLED': 'İptal Edildi'
     };
     return statusMap[status] || status;
   };
@@ -87,7 +107,8 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
       'PENDING': 'bg-yellow-100 text-yellow-800 border-yellow-200',
       'IN_PROGRESS': 'bg-blue-100 text-blue-800 border-blue-200',
       'READY': 'bg-green-100 text-green-800 border-green-200',
-      'SERVED': 'bg-purple-100 text-purple-800 border-purple-200'
+      'SERVED': 'bg-purple-100 text-purple-800 border-purple-200',
+      'CANCELLED': 'bg-red-100 text-red-800 border-red-200'
     };
     return colorMap[status] || 'bg-gray-100 text-gray-800 border-gray-200';
   };
@@ -97,7 +118,8 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
       'PENDING': <Clock className="h-4 w-4" />,
       'IN_PROGRESS': <ChefHat className="h-4 w-4" />,
       'READY': <CheckCircle className="h-4 w-4" />,
-      'SERVED': <Utensils className="h-4 w-4" />
+      'SERVED': <Utensils className="h-4 w-4" />,
+      'CANCELLED': <X className="h-4 w-4" />
     };
     return iconMap[status] || <AlertCircle className="h-4 w-4" />;
   };
@@ -147,11 +169,20 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
         </div>
         <Card>
           <CardContent className="p-6 text-center">
-            <Utensils className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600">Henüz sipariş vermediniz.</p>
+            <ChefHat className="h-12 w-12 text-orange-400 mx-auto mb-4" />
+            <p className="text-gray-600">Siparişiniz hazırlanıyor</p>
             <p className="text-sm text-gray-500 mt-2">
-              Menüden ürün seçerek sipariş verebilirsiniz.
+              Siparişiniz henüz görünmüyor olabilir. Lütfen birkaç saniye bekleyin.
             </p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={loadOrders}
+              className="mt-3"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Yenile
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -225,14 +256,31 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
                 <span className="text-lg">{order.grandTotal.toFixed(2)} ₺</span>
               </div>
 
-              {/* Status Message */}
-              <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-700">
-                  {order.status === 'PENDING' && "Siparişiniz alındı ve mutfağa iletildi."}
-                  {order.status === 'IN_PROGRESS' && "Siparişiniz hazırlanıyor. Lütfen bekleyiniz."}
-                  {order.status === 'READY' && "Siparişiniz hazır! Garsonumuz masanıza getiriyor."}
-                  {order.status === 'SERVED' && "Siparişiniz servis edildi. Afiyet olsun!"}
-                </p>
+              {/* Status Message and Actions */}
+              <div className="mt-3 space-y-3">
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-700">
+                    {order.status === 'PENDING' && "Siparişiniz alındı ve mutfağa iletildi."}
+                    {order.status === 'IN_PROGRESS' && "Siparişiniz hazırlanıyor. Lütfen bekleyiniz."}
+                    {order.status === 'READY' && "Siparişiniz hazır! Garsonumuz masanıza getiriyor."}
+                    {order.status === 'SERVED' && "Siparişiniz servis edildi. Afiyet olsun!"}
+                  </p>
+                </div>
+                
+                {/* Action Buttons */}
+                {(order.status === 'PENDING' || order.status === 'IN_PROGRESS') && (
+                  <div className="flex space-x-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      onClick={() => handleCancelOrder(order.id)}
+                    >
+                      <X className="h-4 w-4 mr-1" />
+                      İptal Et
+                    </Button>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

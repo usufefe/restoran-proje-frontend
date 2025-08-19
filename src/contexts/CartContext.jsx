@@ -65,18 +65,22 @@ export const CartProvider = ({ children }) => {
   };
 
   const updateItemQuantity = (menuItemId, notes = '', newQuantity) => {
+    console.log('🔧 updateItemQuantity:', { menuItemId, notes, newQuantity });
+    
     if (newQuantity <= 0) {
       removeItem(menuItemId, notes);
       return;
     }
 
-    setItems(prevItems =>
-      prevItems.map(item =>
+    setItems(prevItems => {
+      const updatedItems = prevItems.map(item =>
         item.menuItemId === menuItemId && item.notes === notes
           ? { ...item, qty: newQuantity }
           : item
-      )
-    );
+      );
+      console.log('🛒 Updated cart items:', updatedItems);
+      return updatedItems;
+    });
   };
 
   const clearCart = () => {
@@ -93,15 +97,13 @@ export const CartProvider = ({ children }) => {
   };
 
   const getVatTotal = () => {
-    return items.reduce((total, item) => {
-      const itemSubtotal = item.price * item.qty;
-      const itemVat = (itemSubtotal * item.vatRate) / 100;
-      return total + itemVat;
-    }, 0);
+    // KDV artık ayrı hesaplanmıyor - fiyatlar KDV dahil
+    return 0;
   };
 
   const getGrandTotal = () => {
-    return getSubtotal() + getVatTotal();
+    // Sadece subtotal döndür - fiyatlar zaten KDV dahil
+    return getSubtotal();
   };
 
   const toggleCart = () => {

@@ -187,7 +187,8 @@ const KitchenDisplay = () => {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <ChefHat className="h-8 w-8 text-orange-500 mr-3" />
+              <img src="/pardonbakarmisin-logo.png" alt="Logo" className="h-8 w-8 mr-3 rounded-lg" />
+              <ChefHat className="h-6 w-6 text-orange-500 mr-2" />
               <h1 className="text-2xl font-bold">Mutfak Ekranı</h1>
             </div>
             <div className="flex items-center space-x-4">

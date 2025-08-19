@@ -165,7 +165,7 @@ const MenuPage = () => {
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <img src="/pardonbakarmisin%20logo.png" alt="QR Menü" className="h-8 w-8 mr-3" />
+              <img src="/pardonbakarmisin-logo.png" alt="QR Menü" className="h-8 w-8 mr-3" />
               <div>
                 <h1 className="text-xl font-bold text-gray-900">{menu.restaurant.name}</h1>
                 {session && (

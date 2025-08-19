@@ -179,7 +179,10 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Siparişleriniz</h2>
+          <div className="flex items-center">
+            <img src="/pardonbakarmisin-logo.png" alt="Logo" className="h-6 w-6 mr-2 rounded" />
+            <h2 className="text-lg font-semibold">Siparişleriniz</h2>
+          </div>
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-600"></div>
         </div>
       </div>
@@ -190,7 +193,10 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Siparişleriniz</h2>
+          <div className="flex items-center">
+            <img src="/pardonbakarmisin-logo.png" alt="Logo" className="h-6 w-6 mr-2 rounded" />
+            <h2 className="text-lg font-semibold">Siparişleriniz</h2>
+          </div>
           <Button variant="ghost" size="sm" onClick={onClose}>
             ✕
           </Button>
@@ -220,7 +226,10 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Siparişleriniz</h2>
+        <div className="flex items-center">
+          <img src="/pardonbakarmisin-logo.png" alt="Logo" className="h-6 w-6 mr-2 rounded" />
+          <h2 className="text-lg font-semibold">Siparişleriniz</h2>
+        </div>
         <div className="flex space-x-2">
           <Button variant="ghost" size="sm" onClick={loadOrders}>
             <RefreshCw className="h-4 w-4" />

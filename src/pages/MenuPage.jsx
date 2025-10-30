@@ -9,9 +9,9 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { ShoppingCart, Plus, Minus, X, Receipt } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, X, Receipt, Bell, CreditCard } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
-import { menuAPI, sessionAPI, ordersAPI } from '../services/api';
+import { menuAPI, sessionAPI, ordersAPI, waiterCallAPI } from '../services/api';
 import { useToast } from '@/hooks/use-toast';
 import OrderTracking from '../components/OrderTracking';
 
@@ -40,6 +40,8 @@ const MenuPage = () => {
   const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
   const [isOrderSubmitting, setIsOrderSubmitting] = useState(false);
   const [showOrderTracking, setShowOrderTracking] = useState(false);
+  const [isCallingWaiter, setIsCallingWaiter] = useState(false);
+  const [isRequestingBill, setIsRequestingBill] = useState(false);
 
   useEffect(() => {
     const initSession = async () => {
@@ -138,6 +140,76 @@ const MenuPage = () => {
     }
   };
 
+  const handleCallWaiter = async () => {
+    setIsCallingWaiter(true);
+    try {
+      await waiterCallAPI.createCall({
+        tenantId,
+        restaurantId,
+        tableId,
+        type: 'CALL_WAITER'
+      });
+
+      toast({
+        title: "Garson Çağırıldı",
+        description: "Garsonumuz en kısa sürede masanıza gelecek.",
+      });
+    } catch (error) {
+      console.error('Call waiter failed:', error);
+      
+      if (error.response?.status === 400 && error.response?.data?.error === 'Already have a pending call') {
+        toast({
+          title: "Zaten Çağrılmış",
+          description: "Garson çağrınız zaten iletildi.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Hata",
+          description: "Garson çağrılırken bir hata oluştu.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsCallingWaiter(false);
+    }
+  };
+
+  const handleRequestBill = async () => {
+    setIsRequestingBill(true);
+    try {
+      await waiterCallAPI.createCall({
+        tenantId,
+        restaurantId,
+        tableId,
+        type: 'REQUEST_BILL'
+      });
+
+      toast({
+        title: "Hesap İstendi",
+        description: "Garsonumuz hesabınızı en kısa sürede getirecek.",
+      });
+    } catch (error) {
+      console.error('Request bill failed:', error);
+      
+      if (error.response?.status === 400 && error.response?.data?.error === 'Already have a pending call') {
+        toast({
+          title: "Zaten İstenmiş",
+          description: "Hesap talebiniz zaten iletildi.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Hata",
+          description: "Hesap istenirken bir hata oluştu.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsRequestingBill(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -176,23 +248,51 @@ const MenuPage = () => {
                 )}
               </div>
             </div>
-            <div className="flex space-x-2">
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                onClick={handleCallWaiter}
+                disabled={isCallingWaiter}
+                className="hidden sm:flex text-orange-600 border-orange-500 hover:bg-orange-50"
+                size="sm"
+              >
+                <Bell className="h-4 w-4 mr-1" />
+                Garson
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={handleRequestBill}
+                disabled={isRequestingBill}
+                className="hidden sm:flex text-green-600 border-green-500 hover:bg-green-50"
+                size="sm"
+              >
+                <CreditCard className="h-4 w-4 mr-1" />
+                Hesap
+              </Button>
+
               <Button
                 variant="outline"
                 onClick={() => setShowOrderTracking(true)}
-                className="hidden sm:flex"
+                className="hidden sm:flex relative"
+                size="sm"
               >
                 <Receipt className="h-4 w-4 mr-2" />
                 Siparişlerim
+                <Badge className="ml-2 bg-blue-500 text-white text-xs">
+                  Yeni
+                </Badge>
               </Button>
+              
               <Button
                 onClick={toggleCart}
                 className="relative bg-orange-600 hover:bg-orange-700"
+                size="sm"
               >
-                <ShoppingCart className="h-5 w-5 mr-2" />
-                Sepet
+                <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                <span className="hidden sm:inline">Sepet</span>
                 {getItemCount() > 0 && (
-                  <Badge className="absolute -top-2 -right-2 bg-red-500 text-white">
+                  <Badge className="absolute -top-2 -right-2 bg-red-500 text-white text-xs">
                     {getItemCount()}
                   </Badge>
                 )}
@@ -202,18 +302,85 @@ const MenuPage = () => {
         </div>
       </header>
 
+      {/* Quick Actions Bar - Always Visible */}
+      <div className="bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-200 sticky top-16 z-30">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="outline"
+              onClick={handleCallWaiter}
+              disabled={isCallingWaiter}
+              className="w-full py-4 text-base font-semibold border-2 border-orange-500 text-orange-600 hover:bg-orange-100 bg-white"
+            >
+              <Bell className="h-5 w-5 mr-2" />
+              {isCallingWaiter ? 'Çağırılıyor...' : 'Garson Çağır'}
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={handleRequestBill}
+              disabled={isRequestingBill}
+              className="w-full py-4 text-base font-semibold border-2 border-green-500 text-green-600 hover:bg-green-100 bg-white"
+            >
+              <CreditCard className="h-5 w-5 mr-2" />
+              {isRequestingBill ? 'İsteniyor...' : 'Hesap İste'}
+            </Button>
+          </div>
+        </div>
+      </div>
+
       {/* Menu Content */}
       <main className="max-w-4xl mx-auto px-4 py-6">
         {/* Mobile Order Tracking Button */}
-        <div className="sm:hidden mb-4">
+        <div className="mb-4">
           <Button
-            variant="outline"
+            variant="default"
             onClick={() => setShowOrderTracking(true)}
-            className="w-full"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 text-base font-semibold shadow-lg"
           >
-            <Receipt className="h-4 w-4 mr-2" />
+            <Receipt className="h-5 w-5 mr-2" />
             Siparişlerimi Görüntüle
+            <Badge className="ml-2 bg-white text-blue-600 text-xs">
+              Yeni
+            </Badge>
           </Button>
+        </div>
+
+        {/* Old mobile buttons - remove */}
+        <div className="hidden mb-4 space-y-3">
+          <Button
+            variant="default"
+            onClick={() => setShowOrderTracking(true)}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 text-base font-semibold shadow-lg"
+          >
+            <Receipt className="h-5 w-5 mr-2" />
+            Siparişlerimi Görüntüle
+            <Badge className="ml-2 bg-white text-blue-600 text-xs">
+              Yeni
+            </Badge>
+          </Button>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="outline"
+              onClick={handleCallWaiter}
+              disabled={isCallingWaiter}
+              className="w-full py-5 text-base font-semibold border-2 border-orange-500 text-orange-600 hover:bg-orange-50"
+            >
+              <Bell className="h-5 w-5 mr-2" />
+              {isCallingWaiter ? 'Çağırılıyor...' : 'Garson Çağır'}
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={handleRequestBill}
+              disabled={isRequestingBill}
+              className="w-full py-5 text-base font-semibold border-2 border-green-500 text-green-600 hover:bg-green-50"
+            >
+              <CreditCard className="h-5 w-5 mr-2" />
+              {isRequestingBill ? 'İsteniyor...' : 'Hesap İste'}
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue={menu.categories[0]?.id} className="w-full">

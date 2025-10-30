@@ -1,45 +1,121 @@
 import { useState, useEffect, useCallback } from 'react';
 import logoImage from '../assets/logo.png';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Clock, CheckCircle, Utensils, AlertCircle } from 'lucide-react';
-import { ordersAPI } from '../services/api';
+import { Users, Clock, CheckCircle, Utensils, AlertCircle, Bell, CreditCard, Check, X } from 'lucide-react';
+import { ordersAPI, waiterCallAPI } from '../services/api';
 import { useToast } from '@/hooks/use-toast';
 import { io } from 'socket.io-client';
+import { useAuth } from '../contexts/AuthContext';
 
 const WaiterPanel = () => {
   const { restaurantId } = useParams();
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState(null);
   const [activeTab, setActiveTab] = useState('ready');
+  const [waiterCalls, setWaiterCalls] = useState([]);
+  const [callsLoading, setCallsLoading] = useState(false);
+
+  // Auth kontrolü
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      navigate('/admin/login');
+    }
+  }, [authLoading, isAuthenticated, navigate]);
 
   // loadOrders fonksiyonunu useEffect'lerden önce tanımla
   const loadOrders = useCallback(async () => {
+    if (!isAuthenticated) return;
+    
     try {
-      console.log('🔍 Waiter: Siparişler yükleniyor...', { restaurantId });
       const response = await ordersAPI.getRestaurantOrders(restaurantId, {
         limit: 50
       });
-      console.log('✅ Waiter: Siparişler yüklendi:', response.data);
       setOrders(response.data);
     } catch (error) {
-      console.error('❌ Waiter: Sipariş yükleme hatası:', error);
-      console.error('❌ Waiter: Hata detayı:', error.response?.data);
-      toast({
-        title: "Hata",
-        description: `Siparişler yüklenirken bir hata oluştu: ${error.response?.data?.message || error.message}`,
-        variant: "destructive",
-      });
+      // Sessiz hata - auth yoksa zaten redirect olacak
     } finally {
       setLoading(false);
     }
-  }, [restaurantId, toast]);
+  }, [restaurantId, isAuthenticated]);
+
+  const loadCalls = useCallback(async () => {
+    if (!isAuthenticated) return;
+    
+    try {
+      setCallsLoading(true);
+      const response = await waiterCallAPI.getRestaurantCalls(restaurantId, {
+        status: 'PENDING,ACKNOWLEDGED'
+      });
+      setWaiterCalls(response.data);
+    } catch (error) {
+      // Sessizce başarısız ol, spam yaratma
+    } finally {
+      setCallsLoading(false);
+    }
+  }, [restaurantId, isAuthenticated]);
+
+  const handleAcknowledgeCall = async (callId) => {
+    try {
+      await waiterCallAPI.updateCallStatus(callId, 'ACKNOWLEDGED');
+      toast({
+        title: "Çağrı Kabul Edildi",
+        description: "Müşteriye doğru yönlendiriliyorsunuz.",
+      });
+      loadCalls();
+    } catch (error) {
+      console.error('Failed to acknowledge call:', error);
+      toast({
+        title: "Hata",
+        description: "Çağrı kabul edilirken bir hata oluştu.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCompleteCall = async (callId) => {
+    try {
+      await waiterCallAPI.updateCallStatus(callId, 'COMPLETED');
+      toast({
+        title: "Çağrı Tamamlandı",
+        description: "Çağrı başarıyla tamamlandı.",
+      });
+      loadCalls();
+    } catch (error) {
+      console.error('Failed to complete call:', error);
+      toast({
+        title: "Hata",
+        description: "Çağrı tamamlanırken bir hata oluştu.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCancelCall = async (callId) => {
+    try {
+      await waiterCallAPI.deleteCall(callId);
+      toast({
+        title: "Çağrı İptal Edildi",
+        description: "Çağrı iptal edildi.",
+      });
+      loadCalls();
+    } catch (error) {
+      console.error('Failed to cancel call:', error);
+      toast({
+        title: "Hata",
+        description: "Çağrı iptal edilirken bir hata oluştu.",
+        variant: "destructive",
+      });
+    }
+  };
 
   // WebSocket için ayrı useEffect - loadOrders'dan sonra çalışsın
   useEffect(() => {
@@ -47,7 +123,6 @@ const WaiterPanel = () => {
     
     // Listen for order updates
     socket.on('order.updated', (orderData) => {
-      console.log('🔄 Waiter: Sipariş güncellendi:', orderData);
       if (orderData.status === 'READY') {
         toast({
           title: "Sipariş Hazır!",
@@ -58,20 +133,48 @@ const WaiterPanel = () => {
     });
 
     socket.on('order.created', (orderData) => {
-      console.log('🆕 Waiter: Yeni sipariş:', orderData);
       loadOrders();
+    });
+
+    // Listen for order cancellations
+    socket.on('order.cancelled', (orderData) => {
+      toast({
+        title: "Sipariş İptal Edildi",
+        description: `Masa ${orderData.tableCode} (${orderData.tableName}) - Müşteri siparişi iptal etti`,
+        variant: "destructive",
+      });
+      loadOrders();
+    });
+
+    // Listen for waiter calls
+    socket.on('waiter.call.created', (callData) => {
+      toast({
+        title: callData.type === 'CALL_WAITER' ? "Garson Çağrısı!" : "Hesap İstendi!",
+        description: `Masa ${callData.tableCode} (${callData.tableName})`,
+      });
+      loadCalls();
+    });
+
+    socket.on('waiter.call.updated', (callData) => {
+      loadCalls();
+    });
+
+    socket.on('waiter.call.deleted', (callData) => {
+      loadCalls();
     });
 
     return () => {
       socket.off('order.updated');
       socket.off('order.created');
+      socket.off('order.cancelled');
+      socket.off('waiter.call.created');
+      socket.off('waiter.call.updated');
+      socket.off('waiter.call.deleted');
     };
-  }, [socket, loadOrders, restaurantId, toast]);
+  }, [socket, loadOrders, loadCalls, restaurantId, toast]);
 
   useEffect(() => {
     if (!restaurantId) return;
-    
-    console.log('🔌 Waiter WebSocket bağlantısı kuruluyor...');
     
     // Initialize WebSocket connection with error handling
     const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001', {
@@ -87,40 +190,41 @@ const WaiterPanel = () => {
 
     // Connection handlers
     newSocket.on('connect', () => {
-      console.log('✅ Waiter WebSocket bağlandı:', newSocket.id);
       // Join restaurant room after connection
       newSocket.emit('join-restaurant', { restaurantId });
     });
 
     newSocket.on('connect_error', (error) => {
-      console.error('❌ Waiter WebSocket bağlantı hatası:', error);
+      // Sessiz hata - spam yaratma
     });
 
     newSocket.on('disconnect', (reason) => {
-      console.log('🔌 Waiter WebSocket bağlantısı kesildi:', reason);
+      // Sessiz disconnect
     });
 
     // Cleanup function
     return () => {
-      console.log('🧹 Waiter WebSocket temizleniyor...');
       newSocket.removeAllListeners();
       newSocket.disconnect();
     };
   }, [restaurantId]); // SADECE restaurantId değiştiğinde yeniden bağlan
 
   useEffect(() => {
-    if (!restaurantId) return;
+    if (!restaurantId || !isAuthenticated) return;
     
     // İlk yüklemede hemen çağır
     loadOrders();
+    loadCalls();
     
     // 10 saniyede bir yenile
     const interval = setInterval(() => {
       loadOrders();
+      loadCalls();
     }, 10000); // 10 saniye
     
     return () => clearInterval(interval);
-  }, [restaurantId]); // Sadece restaurantId değiştiğinde yeniden başlat
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restaurantId, isAuthenticated]); // loadOrders ve loadCalls dependency'den çıkardık
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
@@ -224,6 +328,12 @@ const WaiterPanel = () => {
               <Badge className="bg-green-100 text-green-800">
                 {filterOrdersByStatus('READY').length} Servise Hazır
               </Badge>
+              {waiterCalls.length > 0 && (
+                <Badge className="bg-orange-500 text-white animate-pulse">
+                  <Bell className="h-3 w-3 mr-1" />
+                  {waiterCalls.length} Çağrı
+                </Badge>
+              )}
               <div className="text-sm text-gray-600">
                 {new Date().toLocaleTimeString('tr-TR')}
               </div>
@@ -235,7 +345,15 @@ const WaiterPanel = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="calls" className="relative">
+              Çağrılar
+              {waiterCalls.length > 0 && (
+                <Badge className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs animate-pulse">
+                  {waiterCalls.length}
+                </Badge>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="ready" className="relative">
               Servise Hazır
               {filterOrdersByStatus('READY').length > 0 && (
@@ -248,6 +366,105 @@ const WaiterPanel = () => {
             <TabsTrigger value="served">Servis Edildi</TabsTrigger>
             <TabsTrigger value="all">Tüm Siparişler</TabsTrigger>
           </TabsList>
+
+          {/* Waiter Calls Tab */}
+          <TabsContent value="calls" className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Müşteri Çağrıları</h2>
+              <Badge className="bg-orange-100 text-orange-800">
+                {waiterCalls.length} aktif çağrı
+              </Badge>
+            </div>
+
+            {waiterCalls.length === 0 ? (
+              <div className="text-center py-16">
+                <Bell className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-600 mb-2">
+                  Bekleyen çağrı yok
+                </h3>
+                <p className="text-gray-500">
+                  Müşteri çağrıları buraya düşecek
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {waiterCalls.map((call) => {
+                  const elapsedMinutes = getElapsedTime(call.createdAt);
+                  const isUrgent = elapsedMinutes > 5;
+                  
+                  return (
+                    <Card key={call.id} className={`${isUrgent ? 'border-red-300 bg-red-50' : 'border-orange-200 bg-orange-50'}`}>
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <CardTitle className="text-lg flex items-center">
+                              {call.type === 'CALL_WAITER' ? (
+                                <Bell className="h-5 w-5 mr-2 text-orange-600" />
+                              ) : (
+                                <CreditCard className="h-5 w-5 mr-2 text-green-600" />
+                              )}
+                              {call.table.name}
+                            </CardTitle>
+                            <CardDescription className="text-gray-600">
+                              {call.table.code} • {elapsedMinutes}dk önce
+                            </CardDescription>
+                          </div>
+                          <Badge className={call.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'}>
+                            {call.status === 'PENDING' ? 'Bekliyor' : 'Kabul Edildi'}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+
+                      <CardContent className="space-y-3">
+                        <div className="p-3 bg-white rounded-lg">
+                          <p className="text-sm font-medium text-gray-900">
+                            {call.type === 'CALL_WAITER' ? '🔔 Garson Çağrısı' : '💳 Hesap Talebi'}
+                          </p>
+                          {call.note && (
+                            <p className="text-sm text-gray-600 mt-1">{call.note}</p>
+                          )}
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                          {call.status === 'PENDING' && (
+                            <Button
+                              onClick={() => handleAcknowledgeCall(call.id)}
+                              className="w-full bg-blue-600 hover:bg-blue-700"
+                              size="sm"
+                            >
+                              <Check className="h-4 w-4 mr-1" />
+                              Kabul Et
+                            </Button>
+                          )}
+                          
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={() => handleCompleteCall(call.id)}
+                              className="flex-1 bg-green-600 hover:bg-green-700"
+                              size="sm"
+                            >
+                              <CheckCircle className="h-4 w-4 mr-1" />
+                              Tamamla
+                            </Button>
+                            
+                            <Button
+                              onClick={() => handleCancelCall(call.id)}
+                              variant="outline"
+                              className="flex-1 text-red-600 border-red-300 hover:bg-red-50"
+                              size="sm"
+                            >
+                              <X className="h-4 w-4 mr-1" />
+                              İptal
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </TabsContent>
 
           {/* Ready Orders */}
           <TabsContent value="ready" className="space-y-6">

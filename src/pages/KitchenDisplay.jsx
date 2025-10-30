@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import logoImage from '../assets/logo.png';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -8,37 +8,41 @@ import { ChefHat, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { ordersAPI } from '../services/api';
 import { useToast } from '@/hooks/use-toast';
 import { io } from 'socket.io-client';
+import { useAuth } from '../contexts/AuthContext';
 
 const KitchenDisplay = () => {
   const { restaurantId } = useParams();
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState(null);
 
+  // Auth kontrolü
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      navigate('/admin/login');
+    }
+  }, [authLoading, isAuthenticated, navigate]);
+
   // loadOrders fonksiyonunu useEffect'lerden önce tanımla
   const loadOrders = useCallback(async () => {
+    if (!isAuthenticated) return;
+    
     try {
-      console.log('🔍 Kitchen: Siparişler yükleniyor...', { restaurantId });
       const response = await ordersAPI.getRestaurantOrders(restaurantId, {
         status: 'PENDING,IN_PROGRESS',
         limit: 20
       });
-      console.log('✅ Kitchen: Siparişler yüklendi:', response.data);
       setOrders(response.data);
     } catch (error) {
-      console.error('❌ Kitchen: Sipariş yükleme hatası:', error);
-      console.error('❌ Kitchen: Hata detayı:', error.response?.data);
-      toast({
-        title: "Hata",
-        description: `Siparişler yüklenirken bir hata oluştu: ${error.response?.data?.message || error.message}`,
-        variant: "destructive",
-      });
+      // Sessiz hata
     } finally {
       setLoading(false);
     }
-  }, [restaurantId, toast]);
+  }, [restaurantId, isAuthenticated]);
 
   // WebSocket için ayrı useEffect - loadOrders'dan sonra çalışsın
   useEffect(() => {
@@ -46,7 +50,6 @@ const KitchenDisplay = () => {
     
     // Listen for new orders
     socket.on('order.created', (orderData) => {
-      console.log('🆕 Yeni sipariş geldi:', orderData);
       toast({
         title: "Yeni Sipariş!",
         description: `Masa ${orderData.tableCode} - ${orderData.itemCount} ürün`,
@@ -56,7 +59,6 @@ const KitchenDisplay = () => {
 
     // Listen for order updates
     socket.on('order.updated', (orderData) => {
-      console.log('🔄 Sipariş güncellendi:', orderData);
       setOrders(prevOrders =>
         prevOrders.map(order =>
           order.id === orderData.orderId
@@ -66,16 +68,28 @@ const KitchenDisplay = () => {
       );
     });
 
+    // Listen for order cancellations
+    socket.on('order.cancelled', (orderData) => {
+      toast({
+        title: "Sipariş İptal Edildi",
+        description: `Masa ${orderData.tableCode} - Sebep: ${getCancelReasonText(orderData.reason)}`,
+        variant: "destructive",
+      });
+      // Remove from active orders list
+      setOrders(prevOrders =>
+        prevOrders.filter(order => order.id !== orderData.orderId)
+      );
+    });
+
     return () => {
       socket.off('order.created');
       socket.off('order.updated');
+      socket.off('order.cancelled');
     };
   }, [socket, loadOrders, restaurantId, toast]);
 
   useEffect(() => {
     if (!restaurantId) return;
-    
-    console.log('🔌 WebSocket bağlantısı kuruluyor...');
     
     // Initialize WebSocket connection with better config
     const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001', {
@@ -91,29 +105,27 @@ const KitchenDisplay = () => {
 
     // Connection handlers
     newSocket.on('connect', () => {
-      console.log('✅ WebSocket bağlandı:', newSocket.id);
       // Join kitchen room after connection
       newSocket.emit('join-kitchen', { restaurantId, station: 'HOT' });
     });
 
     newSocket.on('connect_error', (error) => {
-      console.error('❌ WebSocket bağlantı hatası:', error);
+      // Sessiz hata
     });
 
     newSocket.on('disconnect', (reason) => {
-      console.log('🔌 WebSocket bağlantısı kesildi:', reason);
+      // Sessiz disconnect
     });
 
     // Cleanup function
     return () => {
-      console.log('🧹 WebSocket temizleniyor...');
       newSocket.removeAllListeners();
       newSocket.disconnect();
     };
   }, [restaurantId]); // SADECE restaurantId değiştiğinde yeniden bağlan
 
   useEffect(() => {
-    if (!restaurantId) return;
+    if (!restaurantId || !isAuthenticated) return;
     
     // İlk yüklemede hemen çağır
     loadOrders();
@@ -124,7 +136,8 @@ const KitchenDisplay = () => {
     }, 10000); // 10 saniye
     
     return () => clearInterval(interval);
-  }, [restaurantId]); // Sadece restaurantId değiştiğinde yeniden başlat
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restaurantId, isAuthenticated]); // loadOrders dependency'den çıkarıldı
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
@@ -159,6 +172,17 @@ const KitchenDisplay = () => {
       'SERVED': 'Servis Edildi'
     };
     return statusMap[status] || status;
+  };
+
+  const getCancelReasonText = (reason) => {
+    const reasonMap = {
+      'changed_mind': 'Fikrim değişti',
+      'wrong_order': 'Yanlış sipariş',
+      'too_long': 'Çok uzun sürdü',
+      'duplicate': 'Yanlışlıkla iki kez sipariş verildi',
+      'other': 'Diğer'
+    };
+    return reasonMap[reason] || reason;
   };
 
   const getStatusColor = (status) => {

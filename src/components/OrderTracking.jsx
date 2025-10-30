@@ -3,118 +3,141 @@ import logoImage from '../assets/logo.png';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, ChefHat, CheckCircle, Utensils, AlertCircle, RefreshCw } from 'lucide-react';
+import { Clock, ChefHat, CheckCircle, Utensils, AlertCircle, RefreshCw, X } from 'lucide-react';
 import { ordersAPI } from '../services/api';
 import { useToast } from '@/hooks/use-toast';
 import { io } from 'socket.io-client';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 
 const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [socket, setSocket] = useState(null);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [selectedOrderToCancel, setSelectedOrderToCancel] = useState(null);
+  const [cancelReason, setCancelReason] = useState('');
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (!tableId || !restaurantId || !tenantId) return;
-    
-    console.log('🔌 Customer WebSocket bağlantısı kuruluyor...');
-    
-    // Initialize WebSocket connection
-    const newSocket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001', {
-      transports: ['websocket', 'polling'],
-      timeout: 5000,
-      forceNew: true,
-      reconnection: true,
-      reconnectionAttempts: 3,
-      reconnectionDelay: 2000
-    });
-    
-    setSocket(newSocket);
-
-    // Connection handlers
-    newSocket.on('connect', () => {
-      console.log('✅ Customer WebSocket bağlandı:', newSocket.id);
-      // Join table room after connection
-      newSocket.emit('join-table', { tenantId, restaurantId, tableId });
-    });
-
-    newSocket.on('connect_error', (error) => {
-      console.error('❌ Customer WebSocket bağlantı hatası:', error);
-    });
-
-    newSocket.on('disconnect', (reason) => {
-      console.log('🔌 Customer WebSocket bağlantısı kesildi:', reason);
-    });
-
-    // Listen for order updates
-    newSocket.on('order.updated', (orderData) => {
-      console.log('🔄 Customer: Sipariş güncellendi:', orderData);
-      setOrders(prevOrders =>
-        prevOrders.map(order =>
-          order.id === orderData.orderId
-            ? { ...order, status: orderData.status }
-            : order
-        )
-      );
-
-      // Show notification for status changes
-      if (orderData.status === 'READY') {
-        toast({
-          title: "Siparişiniz Hazır!",
-          description: "Siparişiniz servise hazır, garsonumuz masanıza getirmek üzere.",
-          variant: "success",
-        });
-      } else if (orderData.status === 'IN_PROGRESS') {
-        toast({
-          title: "Siparişiniz Hazırlanıyor",
-          description: "Mutfağımız siparişinizi hazırlamaya başladı.",
-        });
-      }
-    });
-
-    // Cleanup function
-    return () => {
-      console.log('🧹 Customer WebSocket temizleniyor...');
-      newSocket.removeAllListeners();
-      newSocket.disconnect();
-    };
-  }, [tableId, tenantId, restaurantId]); // Bu bileşende bu parametreler değişebilir
-
-  useEffect(() => {
-    loadOrders();
-  }, [tableId]);
-
-  const loadOrders = async () => {
+  const loadOrders = useCallback(async () => {
     try {
       setLoading(true);
       const response = await ordersAPI.getTableOrders(tableId);
       setOrders(response.data);
     } catch (error) {
       console.error('Failed to load orders:', error);
-      toast({
-        title: "Hata",
-        description: "Siparişler yüklenirken bir hata oluştu.",
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
     }
+  }, [tableId]);
+
+  useEffect(() => {
+    if (!tableId || !restaurantId || !tenantId) return;
+    
+    // Load orders once
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        const response = await ordersAPI.getTableOrders(tableId);
+        setOrders(response.data);
+      } catch (error) {
+        console.error('Failed to load orders:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchOrders();
+    
+    // Initialize WebSocket connection
+    const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001', {
+      transports: ['websocket', 'polling'],
+      timeout: 5000,
+      reconnection: true,
+      reconnectionAttempts: 3,
+      reconnectionDelay: 2000
+    });
+    
+    socket.on('connect', () => {
+      socket.emit('join-table', { tenantId, restaurantId, tableId });
+    });
+
+    socket.on('order.updated', (orderData) => {
+      setOrders(prev =>
+        prev.map(order =>
+          order.id === orderData.orderId
+            ? { ...order, status: orderData.status }
+            : order
+        )
+      );
+    });
+
+    return () => {
+      socket.removeAllListeners();
+      socket.disconnect();
+    };
+  }, [tableId, tenantId, restaurantId]);
+
+  const openCancelDialog = (order) => {
+    setSelectedOrderToCancel(order);
+    setCancelReason('');
+    setCancelDialogOpen(true);
   };
 
-  const handleCancelOrder = async (orderId) => {
+  const handleCancelOrder = async () => {
+    if (!selectedOrderToCancel) return;
+    
+    if (!cancelReason) {
+      toast({
+        title: "İptal Sebebi Gerekli",
+        description: "Lütfen iptal sebebini seçiniz.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      await ordersAPI.updateOrderStatus(orderId, 'CANCELLED');
+      await ordersAPI.cancelOrder(selectedOrderToCancel.id, {
+        reason: cancelReason
+      });
+      
       toast({
         title: "Sipariş İptal Edildi",
         description: "Siparişiniz başarıyla iptal edildi.",
-        variant: "success",
       });
-      loadOrders(); // Refresh orders
+      
+      // Update orders state directly instead of reloading
+      setOrders(prevOrders =>
+        prevOrders.map(order =>
+          order.id === selectedOrderToCancel.id
+            ? { ...order, status: 'CANCELLED' }
+            : order
+        )
+      );
+      
+      setCancelDialogOpen(false);
+      setSelectedOrderToCancel(null);
+      setCancelReason('');
     } catch (error) {
       console.error('Failed to cancel order:', error);
       toast({
         title: "Hata",
-        description: "Sipariş iptal edilirken bir hata oluştu.",
+        description: error.response?.data?.error || "Sipariş iptal edilirken bir hata oluştu.",
         variant: "destructive",
       });
     }
@@ -126,7 +149,8 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
       'IN_PROGRESS': 'Hazırlanıyor',
       'READY': 'Servise Hazır',
       'SERVED': 'Servis Edildi',
-      'CANCELLED': 'İptal Edildi'
+      'CANCELLED': 'İptal Edildi',
+      'CLOSED': 'Kapatıldı'
     };
     return statusMap[status] || status;
   };
@@ -137,7 +161,8 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
       'IN_PROGRESS': 'bg-blue-100 text-blue-800 border-blue-200',
       'READY': 'bg-green-100 text-green-800 border-green-200',
       'SERVED': 'bg-purple-100 text-purple-800 border-purple-200',
-      'CANCELLED': 'bg-red-100 text-red-800 border-red-200'
+      'CANCELLED': 'bg-red-100 text-red-800 border-red-200',
+      'CLOSED': 'bg-gray-100 text-gray-800 border-gray-200'
     };
     return colorMap[status] || 'bg-gray-100 text-gray-800 border-gray-200';
   };
@@ -148,7 +173,8 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
       'IN_PROGRESS': <ChefHat className="h-4 w-4" />,
       'READY': <CheckCircle className="h-4 w-4" />,
       'SERVED': <Utensils className="h-4 w-4" />,
-      'CANCELLED': <X className="h-4 w-4" />
+      'CANCELLED': <X className="h-4 w-4" />,
+      'CLOSED': <CheckCircle className="h-4 w-4" />
     };
     return iconMap[status] || <AlertCircle className="h-4 w-4" />;
   };
@@ -171,7 +197,9 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
       'PENDING': 25,
       'IN_PROGRESS': 50,
       'READY': 75,
-      'SERVED': 100
+      'SERVED': 100,
+      'CANCELLED': 0,
+      'CLOSED': 100
     };
     return statusProgress[status] || 0;
   };
@@ -263,7 +291,9 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
               {/* Progress Bar */}
               <div className="w-full bg-gray-200 rounded-full h-2 mt-3">
                 <div 
-                  className="bg-orange-600 h-2 rounded-full transition-all duration-300"
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    order.status === 'CANCELLED' ? 'bg-red-500' : 'bg-orange-600'
+                  }`}
                   style={{ width: `${getProgressPercentage(order.status)}%` }}
                 ></div>
               </div>
@@ -296,12 +326,14 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
 
               {/* Status Message and Actions */}
               <div className="mt-3 space-y-3">
-                <div className="p-3 bg-gray-50 rounded-lg">
+                <div className={`p-3 rounded-lg ${order.status === 'CANCELLED' ? 'bg-red-50 border border-red-200' : 'bg-gray-50'}`}>
                   <p className="text-sm text-gray-700">
                     {order.status === 'PENDING' && "Siparişiniz alındı ve mutfağa iletildi."}
                     {order.status === 'IN_PROGRESS' && "Siparişiniz hazırlanıyor. Lütfen bekleyiniz."}
                     {order.status === 'READY' && "Siparişiniz hazır! Garsonumuz masanıza getiriyor."}
                     {order.status === 'SERVED' && "Siparişiniz servis edildi. Afiyet olsun!"}
+                    {order.status === 'CANCELLED' && "❌ Bu sipariş iptal edildi."}
+                    {order.status === 'CLOSED' && "✅ Sipariş tamamlandı ve kapatıldı."}
                   </p>
                 </div>
                 
@@ -309,13 +341,13 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
                 {(order.status === 'PENDING' || order.status === 'IN_PROGRESS') && (
                   <div className="flex space-x-2">
                     <Button 
-                      variant="outline" 
+                      variant="destructive" 
                       size="sm"
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      onClick={() => handleCancelOrder(order.id)}
+                      className="w-full"
+                      onClick={() => openCancelDialog(order)}
                     >
                       <X className="h-4 w-4 mr-1" />
-                      İptal Et
+                      Siparişi İptal Et
                     </Button>
                   </div>
                 )}
@@ -324,6 +356,67 @@ const OrderTracking = ({ tableId, tenantId, restaurantId, onClose }) => {
           </Card>
         ))}
       </div>
+
+      {/* Cancel Order Dialog */}
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center text-red-600">
+              <AlertCircle className="h-5 w-5 mr-2" />
+              Siparişi İptal Et
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedOrderToCancel && (
+                <>
+                  <span className="font-semibold">Sipariş #{selectedOrderToCancel.id.slice(-8)}</span> iptal edilecek.
+                  Bu işlem geri alınamaz.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          
+          <div className="space-y-4 px-6">
+            <div className="space-y-2">
+              <Label htmlFor="cancel-reason" className="text-gray-700 font-medium">
+                İptal Sebebi <span className="text-red-500">*</span>
+              </Label>
+              <Select value={cancelReason} onValueChange={setCancelReason}>
+                <SelectTrigger id="cancel-reason" className="w-full">
+                  <SelectValue placeholder="Lütfen bir sebep seçiniz" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="changed_mind">Fikrim değişti</SelectItem>
+                  <SelectItem value="wrong_order">Yanlış sipariş verdim</SelectItem>
+                  <SelectItem value="too_long">Çok uzun sürdü</SelectItem>
+                  <SelectItem value="duplicate">Yanlışlıkla iki kez sipariş verdim</SelectItem>
+                  <SelectItem value="other">Diğer</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {selectedOrderToCancel && selectedOrderToCancel.status === 'IN_PROGRESS' && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <p className="text-sm text-yellow-800">
+                  ⚠️ Siparişiniz mutfakta hazırlanıyor. İptal etmeniz durumunda fire oluşabilir.
+                </p>
+              </div>
+            )}
+          </div>
+
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel className="w-full sm:w-auto">
+              Vazgeç
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCancelOrder}
+              className="w-full sm:w-auto bg-red-600 hover:bg-red-700"
+              disabled={!cancelReason}
+            >
+              Evet, İptal Et
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -84,6 +84,7 @@ export const ordersAPI = {
   },
   updateOrderStatus: (orderId, status) => api.patch(`/orders/${orderId}/status`, { status }), // Auth required for staff
   updateOrderItemStatus: (itemId, status) => api.patch(`/orders/items/${itemId}/status`, { status }), // Auth required for staff
+  cancelOrder: (orderId, cancelData) => customerApi.post(`/orders/${orderId}/cancel`, cancelData), // No auth for customer cancel
 };
 
 // Admin API
@@ -98,6 +99,17 @@ export const adminAPI = {
   updateMenuItem: (restaurantId, itemId, itemData) => api.put(`/admin/restaurants/${restaurantId}/items/${itemId}`, itemData),
   getUsers: () => api.get('/admin/users'),
   updateUserStatus: (userId, isActive) => api.patch(`/admin/users/${userId}/status`, { isActive }),
+};
+
+// Waiter Call API
+export const waiterCallAPI = {
+  createCall: (callData) => customerApi.post('/waiter-call/create', callData), // No auth for customer calls
+  getRestaurantCalls: (restaurantId, params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return api.get(`/waiter-call/restaurant/${restaurantId}?${query}`); // Auth required for staff
+  },
+  updateCallStatus: (callId, status) => api.patch(`/waiter-call/${callId}/status`, { status }), // Auth required for staff
+  deleteCall: (callId) => api.delete(`/waiter-call/${callId}`), // Auth required for staff
 };
 
 export default api;

@@ -6,6 +6,7 @@ import AddTableModal from '../components/AddTableModal';
 import AddCategoryModal from '../components/AddCategoryModal';
 import AddMenuItemModal from '../components/AddMenuItemModal';
 import EditMenuItemModal from '../components/EditMenuItemModal';
+import AddUserModal from '../components/AddUserModal';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -51,6 +52,7 @@ const AdminDashboard = () => {
   const [isAddMenuItemModalOpen, setIsAddMenuItemModalOpen] = useState(false);
   const [isEditMenuItemModalOpen, setIsEditMenuItemModalOpen] = useState(false);
   const [selectedMenuItem, setSelectedMenuItem] = useState(null);
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [dashboardStats, setDashboardStats] = useState({
     todayOrders: 0,
     todayRevenue: 0,
@@ -114,8 +116,14 @@ const AdminDashboard = () => {
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       navigate('/admin/login');
+      return;
     }
-  }, [isAuthenticated, loading, navigate]);
+    
+    // Role-based redirect - only ADMIN can access dashboard
+    if (!loading && isAuthenticated && user && user.role !== 'ADMIN') {
+      navigate('/admin/login');
+    }
+  }, [isAuthenticated, loading, navigate, user]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -461,6 +469,11 @@ const AdminDashboard = () => {
     );
   };
 
+  const handleUserAdded = (newUser) => {
+    setUsers(prevUsers => [...prevUsers, newUser]);
+  };
+
+  // Auth ve role kontrolü
   if (loading || isLoading) {
     return (
       <div className="min-h-screen bg-slate-100 flex items-center justify-center px-6">
@@ -473,6 +486,32 @@ const AdminDashboard = () => {
             </div>
             <p className="text-sm text-slate-500">Veriler yükleniyor...</p>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Role kontrolü - ADMIN değilse gösterme
+  if (!loading && isAuthenticated && user && user.role !== 'ADMIN') {
+    return (
+      <div className="min-h-screen bg-slate-100 flex items-center justify-center px-6">
+        <div className="flex flex-col items-center gap-4 text-center max-w-md">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-red-600">
+            <Shield className="h-8 w-8" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold text-slate-900">Erişim Engellendi</h2>
+            <p className="text-sm text-slate-600">
+              Bu sayfaya erişim yetkiniz bulunmuyor. Sadece Admin kullanıcıları bu paneli görüntüleyebilir.
+            </p>
+            <p className="text-xs text-slate-500">
+              Rol: <span className="font-semibold">{user.role}</span>
+            </p>
+          </div>
+          <Button onClick={handleLogout} variant="outline" className="mt-4">
+            <LogOut className="h-4 w-4 mr-2" />
+            Çıkış Yap
+          </Button>
         </div>
       </div>
     );
@@ -890,13 +929,16 @@ const AdminDashboard = () => {
               <TabsContent value="users" className="space-y-6">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h2 className="text-xl font-semibold text-slate-900">Kullanıcı yönetimi</h2>
-                    <p className="text-sm text-slate-500">Sistem kullanıcıları ve yetkileri</p>
-                  </div>
-                  <Button className="justify-center gap-2 bg-slate-900 text-white hover:bg-slate-800">
-                    <Plus className="h-4 w-4" />
-                    Yeni kullanıcı ekle
-                  </Button>
+                  <h2 className="text-xl font-semibold text-slate-900">Kullanıcı yönetimi</h2>
+                  <p className="text-sm text-slate-500">Sistem kullanıcıları ve yetkileri</p>
+                </div>
+                <Button 
+                  onClick={() => setIsAddUserModalOpen(true)}
+                  className="justify-center gap-2 bg-slate-900 text-white hover:bg-slate-800"
+                >
+                  <Plus className="h-4 w-4" />
+                  Yeni kullanıcı ekle
+                </Button>
                 </div>
 
                 <Card className="overflow-hidden border border-slate-200 bg-white shadow-sm">
@@ -1008,6 +1050,13 @@ const AdminDashboard = () => {
           categories={menu}
           menuItem={selectedMenuItem}
           onMenuItemUpdated={handleMenuItemUpdated}
+        />
+
+        {/* Add User Modal */}
+        <AddUserModal
+          isOpen={isAddUserModalOpen}
+          onClose={() => setIsAddUserModalOpen(false)}
+          onUserAdded={handleUserAdded}
         />
 
         {/* QR Code Modal for Mobile & Desktop */}

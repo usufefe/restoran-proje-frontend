@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { QrCode, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { adminAPI } from '../services/api';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -21,11 +22,7 @@ const AdminLogin = () => {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (!loading && isAuthenticated) {
-      navigate('/admin/dashboard');
-    }
-  }, [isAuthenticated, loading, navigate]);
+  // useEffect kaldırıldı - login fonksiyonu zaten yönlendiriyor
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,7 +32,29 @@ const AdminLogin = () => {
     try {
       const result = await login(formData);
       if (result.success) {
-        navigate('/admin/dashboard');
+        // Role-based yönlendirme
+        const userRole = result.user?.role;
+        const restaurantId = result.user?.restaurantId;
+        
+        if (userRole === 'ADMIN') {
+          navigate('/admin/dashboard');
+        } else if (userRole === 'WAITER') {
+          if (restaurantId) {
+            navigate(`/waiter/${restaurantId}`);
+          } else {
+            setError('Restaurant bulunamadı. Lütfen admin ile iletişime geçin.');
+          }
+        } else if (userRole === 'CHEF') {
+          if (restaurantId) {
+            navigate(`/kitchen/${restaurantId}`);
+          } else {
+            setError('Restaurant bulunamadı. Lütfen admin ile iletişime geçin.');
+          }
+        } else if (userRole === 'CASHIER') {
+          setError('Kasiyer paneli henüz aktif değil.');
+        } else {
+          setError('Geçersiz kullanıcı rolü.');
+        }
       } else {
         setError(result.error);
       }

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Clock, CheckCircle, Utensils, AlertCircle, Bell, CreditCard, Check, X } from 'lucide-react';
+import { Users, Clock, CheckCircle, Utensils, AlertCircle, Bell, CreditCard, Check, X, LogOut, User } from 'lucide-react';
 import { ordersAPI, waiterCallAPI } from '../services/api';
 import { useToast } from '@/hooks/use-toast';
 import { io } from 'socket.io-client';
@@ -15,7 +15,7 @@ const WaiterPanel = () => {
   const { restaurantId } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading: authLoading, user, logout } = useAuth();
   
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -322,21 +322,37 @@ const WaiterPanel = () => {
               <h1 className="text-2xl font-bold text-gray-900">Garson Paneli</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <Badge variant="outline">
+              <Badge variant="outline" className="hidden sm:flex">
                 {orders.length} Toplam Sipariş
               </Badge>
-              <Badge className="bg-green-100 text-green-800">
+              <Badge className="bg-green-100 text-green-800 hidden sm:flex">
                 {filterOrdersByStatus('READY').length} Servise Hazır
               </Badge>
               {waiterCalls.length > 0 && (
                 <Badge className="bg-orange-500 text-white animate-pulse">
                   <Bell className="h-3 w-3 mr-1" />
-                  {waiterCalls.length} Çağrı
+                  {waiterCalls.length}
                 </Badge>
               )}
-              <div className="text-sm text-gray-600">
-                {new Date().toLocaleTimeString('tr-TR')}
+              
+              {/* User Info */}
+              <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600">
+                <User className="h-4 w-4" />
+                <span className="font-medium">{user?.name}</span>
               </div>
+              
+              {/* Logout Button */}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => {
+                  logout();
+                  navigate('/admin/login');
+                }}
+                className="text-gray-600"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>

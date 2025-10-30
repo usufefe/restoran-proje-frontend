@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChefHat, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { ChefHat, Clock, CheckCircle, AlertCircle, LogOut, User } from 'lucide-react';
 import { ordersAPI } from '../services/api';
 import { useToast } from '@/hooks/use-toast';
 import { io } from 'socket.io-client';
@@ -14,7 +14,7 @@ const KitchenDisplay = () => {
   const { restaurantId } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading: authLoading, user, logout } = useAuth();
   
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -231,12 +231,32 @@ const KitchenDisplay = () => {
               <h1 className="text-2xl font-bold">Mutfak Ekranı</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <Badge variant="outline" className="text-white border-white">
+              <Badge variant="outline" className="text-white border-white hidden sm:flex">
                 {orders.length} Aktif Sipariş
               </Badge>
+              
+              {/* User Info */}
+              <div className="hidden sm:flex items-center gap-2 text-sm text-gray-300">
+                <User className="h-4 w-4" />
+                <span className="font-medium">{user?.name}</span>
+              </div>
+              
               <div className="text-sm text-gray-300">
                 {new Date().toLocaleTimeString('tr-TR')}
               </div>
+              
+              {/* Logout Button */}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => {
+                  logout();
+                  navigate('/admin/login');
+                }}
+                className="text-white border-white hover:bg-gray-700"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
